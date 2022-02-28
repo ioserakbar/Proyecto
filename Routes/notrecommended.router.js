@@ -15,7 +15,7 @@ router.get('/', (req, res, next) => {
     const notRecommendeds = service.find(size || 10)
     res.json({
       'success': true,
-      'message': 'Esta es la multimedia en los comentarios encontrados',
+      'message': 'Estos son los no recomendados encontrados',
       'Data': notRecommendeds
     });
 
@@ -33,7 +33,7 @@ router.post('/', validatorHandler(createCommentchema, 'body'), (req, res, next) 
 
     res.json({
       'success': true, 
-      'message': "El comentario se ha creado con exito", 
+      'message': "El no recomendado se ha creado con exito", 
       'Data': notRecommended 
    });
   } catch (error) {
@@ -51,7 +51,7 @@ router.get('/:id', validatorHandler(getValidComment, 'params'),  (req, res, next
     const notRecommended =  service.findOne(id);
     res.json({
       'success': true,
-      'message': 'Este es el comentario encontrado',
+      'message': 'Este es el no recomendado encontrado',
       'Data': notRecommended
     });
   } catch (error){
@@ -69,7 +69,7 @@ router.patch('/:id', validatorHandler(getValidComment, 'params'), validatorHandl
     const { old, changed} = service.update(id, data);
     res.json({
       'success': true,
-      'message': "Se ha actualizado el siguiente comentario",
+      'message': "Se ha actualizado el siguiente no recomendado",
       'Data': {
         "Original": old,
         "Modificado": changed
@@ -87,10 +87,10 @@ router.delete('/:id', validatorHandler(getValidComment, 'params'), (req, res, ne
     const notRecommended = service.delete(id);
     res.json({
       'success': true,
-      'message': "Se ha eliminado este comentario",
+      'message': "Se ha eliminado este no recomendado",
       'Data': {
-        "message": "Chat room  eliminado",
-        "product" : notRecommended
+        "message": "No recomendado eliminado",
+        "Data" : notRecommended
       }
     });
   } catch (error) {

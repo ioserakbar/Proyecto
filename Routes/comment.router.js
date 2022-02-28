@@ -89,8 +89,8 @@ router.delete('/:id', validatorHandler(getValidComment, 'params'), (req, res, ne
       'success': true,
       'message': "Se ha eliminado este comentario",
       'Data': {
-        "message": "Chat room  eliminado",
-        "product" : comment
+        "message": "Comentario eliminado",
+        "Data" : comment
       }
     });
   } catch (error) {

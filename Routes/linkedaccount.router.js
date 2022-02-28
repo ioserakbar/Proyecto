@@ -1,9 +1,9 @@
 const express= require('express');
 const router = express.Router();
-const Service = require('../Services/linkedlinkedAccount.service');
+const Service = require('../Services/linkedAccount.service');
 const service = new Service();
 const validatorHandler = require('./../Middlewares/validator.handler')
-const { createCommentchema, updateCommentSchema, getValidComment } = require('../Schemas/linkedlinkedAccount.schema');
+const { createCommentchema, updateCommentSchema, getValidComment } = require('../Schemas/linkedAccount.schema');
 
 
 //GET ALL PRODUCTS
@@ -15,7 +15,7 @@ router.get('/', (req, res, next) => {
     const linkedAccounts = service.find(size || 10)
     res.json({
       'success': true,
-      'message': 'Esta es la multimedia en los comentarios encontrados',
+      'message': 'Estas son las cuentas linkeadas encontradas',
       'Data': linkedAccounts
     });
 
@@ -33,7 +33,7 @@ router.post('/', validatorHandler(createCommentchema, 'body'), (req, res, next) 
 
     res.json({
       'success': true, 
-      'message': "El comentario se ha creado con exito", 
+      'message': "La cuenta linkeada se ha creado con exito", 
       'Data': linkedAccount 
    });
   } catch (error) {
@@ -51,7 +51,7 @@ router.get('/:id', validatorHandler(getValidComment, 'params'),  (req, res, next
     const linkedAccount =  service.findOne(id);
     res.json({
       'success': true,
-      'message': 'Este es el comentario encontrado',
+      'message': 'Este es la cuenta linkeada encontrada',
       'Data': linkedAccount
     });
   } catch (error){
@@ -69,7 +69,7 @@ router.patch('/:id', validatorHandler(getValidComment, 'params'), validatorHandl
     const { old, changed} = service.update(id, data);
     res.json({
       'success': true,
-      'message': "Se ha actualizado el siguiente comentario",
+      'message': "Se ha actualizado la siguiente cuenta linkeada",
       'Data': {
         "Original": old,
         "Modificado": changed
@@ -87,10 +87,10 @@ router.delete('/:id', validatorHandler(getValidComment, 'params'), (req, res, ne
     const linkedAccount = service.delete(id);
     res.json({
       'success': true,
-      'message': "Se ha eliminado este comentario",
+      'message': "Se ha eliminado esta cuenta linkeada",
       'Data': {
-        "message": "Chat room  eliminado",
-        "product" : linkedAccount
+        "message": "Cuenta linkeada eliminada",
+        "Data" : linkedAccount
       }
     });
   } catch (error) {

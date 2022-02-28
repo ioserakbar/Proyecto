@@ -15,7 +15,7 @@ router.get('/', (req, res, next) => {
     const users = service.find(size || 10)
     res.json({
       'success': true,
-      'message': 'Esta es la multimedia en los comentarios encontrados',
+      'message': 'Estos son los usuarios encontrados',
       'Data': users
     });
 
@@ -33,7 +33,7 @@ router.post('/', validatorHandler(createCommentchema, 'body'), (req, res, next) 
 
     res.json({
       'success': true, 
-      'message': "El comentario se ha creado con exito", 
+      'message': "El usuario se ha creado con exito", 
       'Data': user 
    });
   } catch (error) {
@@ -51,7 +51,7 @@ router.get('/:id', validatorHandler(getValidComment, 'params'),  (req, res, next
     const user =  service.findOne(id);
     res.json({
       'success': true,
-      'message': 'Este es el comentario encontrado',
+      'message': 'Este es el usuario encontrado',
       'Data': user
     });
   } catch (error){
@@ -69,7 +69,7 @@ router.patch('/:id', validatorHandler(getValidComment, 'params'), validatorHandl
     const { old, changed} = service.update(id, data);
     res.json({
       'success': true,
-      'message': "Se ha actualizado el siguiente comentario",
+      'message': "Se ha actualizado el siguiente usuario",
       'Data': {
         "Original": old,
         "Modificado": changed
@@ -87,9 +87,9 @@ router.delete('/:id', validatorHandler(getValidComment, 'params'), (req, res, ne
     const user = service.delete(id);
     res.json({
       'success': true,
-      'message': "Se ha eliminado este comentario",
+      'message': "Se ha eliminado este usuario",
       'Data': {
-        "message": "Chat room  eliminado",
+        "message": "Usuario eliminado",
         "product" : user
       }
     });

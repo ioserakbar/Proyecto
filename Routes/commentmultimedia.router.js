@@ -33,7 +33,7 @@ router.post('/', validatorHandler(createCommentchema, 'body'), (req, res, next) 
 
     res.json({
       'success': true, 
-      'message': "El comentario se ha creado con exito", 
+      'message': "La multimedia del comentario se ha creado con exito", 
       'Data': commentMultimedia 
    });
   } catch (error) {
@@ -51,7 +51,7 @@ router.get('/:id', validatorHandler(getValidComment, 'params'),  (req, res, next
     const commentMultimedia =  service.findOne(id);
     res.json({
       'success': true,
-      'message': 'Este es el comentario encontrado',
+      'message': 'Este es la multimedia del comentario encontrado',
       'Data': commentMultimedia
     });
   } catch (error){
@@ -69,7 +69,7 @@ router.patch('/:id', validatorHandler(getValidComment, 'params'), validatorHandl
     const { old, changed} = service.update(id, data);
     res.json({
       'success': true,
-      'message': "Se ha actualizado el siguiente comentario",
+      'message': "Se ha actualizado la siguiente multimedia del comentario",
       'Data': {
         "Original": old,
         "Modificado": changed
@@ -87,10 +87,10 @@ router.delete('/:id', validatorHandler(getValidComment, 'params'), (req, res, ne
     const commentMultimedia = service.delete(id);
     res.json({
       'success': true,
-      'message': "Se ha eliminado este comentario",
+      'message': "Se ha eliminado la multimedia de este comentario",
       'Data': {
-        "message": "Chat room  eliminado",
-        "product" : commentMultimedia
+        "message": "Multimedia del comentario eliminado",
+        "Data" : commentMultimedia
       }
     });
   } catch (error) {

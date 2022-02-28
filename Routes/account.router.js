@@ -15,7 +15,7 @@ router.get('/', (req, res, next) => {
     const accounts = service.find(size || 10)
     res.json({
       'success': true,
-      'message': 'Estos son los productos encontrados',
+      'message': 'Estas son las cuentas encontradas',
       'Data': accounts
     });
 
@@ -33,7 +33,7 @@ router.post('/', validatorHandler(createAccountSchema, 'body'), (req, res, next)
 
     res.json({
       'success': true, 
-      'message': "El producto se ha creado con exito", 
+      'message': "La cuenta se ha creado con exito", 
       'Data': account 
    });
   } catch (error) {
@@ -51,7 +51,7 @@ router.get('/:id', validatorHandler(getValidAccount, 'params'),  (req, res, next
     const account =  service.findOne(id);
     res.json({
       'success': true,
-      'message': 'Este es el producto encontrado',
+      'message': 'Este es la cuenta encontrada',
       'Data': account
     });
   } catch (error){
@@ -69,7 +69,7 @@ router.patch('/:id', validatorHandler(getValidAccount, 'params'), validatorHandl
     const { old, changed} = service.update(id, data);
     res.json({
       'success': true,
-      'message': "Se ha actualizado el siguiente registro",
+      'message': "Se ha actualizado la siguiente cuenta",
       'Data': {
         "Original": old,
         "Modificado": changed
@@ -90,7 +90,7 @@ router.delete('/:id', validatorHandler(getValidAccount, 'params'), (req, res, ne
       'message': "Se ha eliminado esta cuenta",
       'Data': {
         "message": "Cuenta eliminado",
-        "product" : account
+        "Data" : account
       }
     });
   } catch (error) {

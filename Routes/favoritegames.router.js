@@ -15,7 +15,7 @@ router.get('/', (req, res, next) => {
     const favoriteGames = service.find(size || 10)
     res.json({
       'success': true,
-      'message': 'Esta es la multimedia en los comentarios encontrados',
+      'message': 'Estos son los juegos favoritos encontrados',
       'Data': favoriteGames
     });
 
@@ -33,7 +33,7 @@ router.post('/', validatorHandler(createCommentchema, 'body'), (req, res, next) 
 
     res.json({
       'success': true, 
-      'message': "El comentario se ha creado con exito", 
+      'message': "El juego favorito se ha creado con exito", 
       'Data': favoriteGame 
    });
   } catch (error) {
@@ -51,7 +51,7 @@ router.get('/:id', validatorHandler(getValidComment, 'params'),  (req, res, next
     const favoriteGame =  service.findOne(id);
     res.json({
       'success': true,
-      'message': 'Este es el comentario encontrado',
+      'message': 'Este es el juego favorito encontrado',
       'Data': favoriteGame
     });
   } catch (error){
@@ -69,7 +69,7 @@ router.patch('/:id', validatorHandler(getValidComment, 'params'), validatorHandl
     const { old, changed} = service.update(id, data);
     res.json({
       'success': true,
-      'message': "Se ha actualizado el siguiente comentario",
+      'message': "Se ha actualizado el siguiente juego favorito",
       'Data': {
         "Original": old,
         "Modificado": changed
@@ -87,10 +87,10 @@ router.delete('/:id', validatorHandler(getValidComment, 'params'), (req, res, ne
     const favoriteGame = service.delete(id);
     res.json({
       'success': true,
-      'message': "Se ha eliminado este comentario",
+      'message': "Se ha eliminado este juego favorito",
       'Data': {
-        "message": "Chat room  eliminado",
-        "product" : favoriteGame
+        "message": "Juego favorito eliminado",
+        "Data" : favoriteGame
       }
     });
   } catch (error) {

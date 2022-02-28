@@ -15,7 +15,7 @@ router.get('/', (req, res, next) => {
     const countrys = service.find(size || 10)
     res.json({
       'success': true,
-      'message': 'Esta es la multimedia en los comentarios encontrados',
+      'message': 'Estos son los paises encontrados',
       'Data': countrys
     });
 
@@ -33,7 +33,7 @@ router.post('/', validatorHandler(createCommentchema, 'body'), (req, res, next) 
 
     res.json({
       'success': true, 
-      'message': "El comentario se ha creado con exito", 
+      'message': "El pais se ha creado con exito", 
       'Data': country 
    });
   } catch (error) {
@@ -51,7 +51,7 @@ router.get('/:id', validatorHandler(getValidComment, 'params'),  (req, res, next
     const country =  service.findOne(id);
     res.json({
       'success': true,
-      'message': 'Este es el comentario encontrado',
+      'message': 'Este es el pais encontrado',
       'Data': country
     });
   } catch (error){
@@ -69,7 +69,7 @@ router.patch('/:id', validatorHandler(getValidComment, 'params'), validatorHandl
     const { old, changed} = service.update(id, data);
     res.json({
       'success': true,
-      'message': "Se ha actualizado el siguiente comentario",
+      'message': "Se ha actualizado el siguiente pais",
       'Data': {
         "Original": old,
         "Modificado": changed
@@ -87,10 +87,10 @@ router.delete('/:id', validatorHandler(getValidComment, 'params'), (req, res, ne
     const country = service.delete(id);
     res.json({
       'success': true,
-      'message': "Se ha eliminado este comentario",
+      'message': "Se ha eliminado este pais",
       'Data': {
-        "message": "Chat room  eliminado",
-        "product" : country
+        "message": "Pais eliminado",
+        "Data" : country
       }
     });
   } catch (error) {

@@ -15,7 +15,7 @@ router.get('/', (req, res, next) => {
     const chatrooms = service.find(size || 10)
     res.json({
       'success': true,
-      'message': 'Estos son los productos encontrados',
+      'message': 'Estos son los chat rooms encontrados',
       'Data': chatrooms
     });
 
@@ -89,8 +89,8 @@ router.delete('/:id', validatorHandler(getValidChatroom, 'params'), (req, res, n
       'success': true,
       'message': "Se ha eliminado este chat room",
       'Data': {
-        "message": "Chat room  eliminado",
-        "product" : chatroom
+        "message": "Chat room eliminado",
+        "Data" : chatroom
       }
     });
   } catch (error) {
