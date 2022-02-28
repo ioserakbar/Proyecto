@@ -12,11 +12,11 @@ router.get('/', (req, res, next) => {
   try{
 
     const {size} = req.query;
-    const accounts = service.find(size || 10)
+    const chatrooms = service.find(size || 10)
     res.json({
       'success': true,
       'message': 'Estos son los productos encontrados',
-      'Data': accounts
+      'Data': chatrooms
     });
 
   } catch (error){
@@ -29,12 +29,12 @@ router.get('/', (req, res, next) => {
 router.post('/', validatorHandler(createChatroomSchema, 'body'), (req, res, next) => {  
   try {
     const body = req.body;
-    const account = service.create(body);
+    const chatroom = service.create(body);
 
     res.json({
       'success': true, 
       'message': "El chat room se ha creado con exito", 
-      'Data': account 
+      'Data': chatroom 
    });
   } catch (error) {
     next(error);
@@ -48,11 +48,11 @@ router.get('/:id', validatorHandler(getValidChatroom, 'params'),  (req, res, nex
   try{
     const {id} = req.params;
 
-    const account =  service.findOne(id);
+    const chatroom =  service.findOne(id);
     res.json({
       'success': true,
       'message': 'Este es el chat room encontrado',
-      'Data': account
+      'Data': chatroom
     });
   } catch (error){
     next(error);
@@ -84,13 +84,13 @@ router.patch('/:id', validatorHandler(getValidChatroom, 'params'), validatorHand
 router.delete('/:id', validatorHandler(getValidChatroom, 'params'), (req, res, next) => {
   try {
     const { id } = req.params;
-    const account = service.delete(id);
+    const chatroom = service.delete(id);
     res.json({
       'success': true,
       'message': "Se ha eliminado este chat room",
       'Data': {
         "message": "Chat room  eliminado",
-        "product" : account
+        "product" : chatroom
       }
     });
   } catch (error) {

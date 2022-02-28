@@ -18,25 +18,25 @@ const videoPlayRouter = require('./videoplay.router');
 
 const routerApi = (app) =>{
 
-    const router = express.Router();
-    app.use('/api/v1', router);
-    //endpints de la v1
-    router.use('/account', accountsRouter);
-    router.use('/chatroom', chatroomRouter);
-    router.use('/comment', commentRouter);
-    router.use('/commentMultimedia', commentMultimediaRouter);
-    router.use('/country', countryRouter);
-    router.use('/favoriteGames', favoriteGamesRouter);
-    router.use('/friend', friendRouter);
-    router.use('/game', gameRouter);
-    router.use('/linkedaccount', linkedAccountRouter);
-    router.use('/message', messageRouter);
-    router.use('/multimedia', multimediaRouter);
-    router.use('/notRecommended', notRecommendedRouter);
-    router.use('/recommended', recommendedRouter);
-    router.use('/schedule', scheduleRouter);
-    router.use('/user', userRouter);
-    router.use('/videoPlay', videoPlayRouter);
+  const router = express.Router();
+  app.use('/api/v1', router);
+  //endpints de la v1
+  router.use('/account', accountsRouter);
+  router.use('/chatroom', chatroomRouter);
+  router.use('/comment', commentRouter);
+  router.use('/commentMultimedia', commentMultimediaRouter);
+  router.use('/country', countryRouter);
+  router.use('/favoriteGames', favoriteGamesRouter);
+  router.use('/friend', friendRouter);
+  router.use('/game', gameRouter);
+  router.use('/linkedaccount', linkedAccountRouter);
+  router.use('/message', messageRouter);
+  router.use('/multimedia', multimediaRouter);
+  router.use('/notRecommended', notRecommendedRouter);
+  router.use('/recommended', recommendedRouter);
+  router.use('/schedule', scheduleRouter);
+  router.use('/user', userRouter);
+  router.use('/videoPlay', videoPlayRouter);
 }
 
 module.exports = routerApi;

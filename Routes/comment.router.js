@@ -12,11 +12,11 @@ router.get('/', (req, res, next) => {
   try{
 
     const {size} = req.query;
-    const accounts = service.find(size || 10)
+    const comments = service.find(size || 10)
     res.json({
       'success': true,
       'message': 'Estos son los comentarios encontrados',
-      'Data': accounts
+      'Data': comments
     });
 
   } catch (error){
@@ -29,12 +29,12 @@ router.get('/', (req, res, next) => {
 router.post('/', validatorHandler(createCommentchema, 'body'), (req, res, next) => {  
   try {
     const body = req.body;
-    const account = service.create(body);
+    const comment = service.create(body);
 
     res.json({
       'success': true, 
       'message': "El comentario se ha creado con exito", 
-      'Data': account 
+      'Data': comment 
    });
   } catch (error) {
     next(error);
@@ -48,11 +48,11 @@ router.get('/:id', validatorHandler(getValidComment, 'params'),  (req, res, next
   try{
     const {id} = req.params;
 
-    const account =  service.findOne(id);
+    const comment =  service.findOne(id);
     res.json({
       'success': true,
       'message': 'Este es el comentario encontrado',
-      'Data': account
+      'Data': comment
     });
   } catch (error){
     next(error);
@@ -84,13 +84,13 @@ router.patch('/:id', validatorHandler(getValidComment, 'params'), validatorHandl
 router.delete('/:id', validatorHandler(getValidComment, 'params'), (req, res, next) => {
   try {
     const { id } = req.params;
-    const account = service.delete(id);
+    const comment = service.delete(id);
     res.json({
       'success': true,
       'message': "Se ha eliminado este comentario",
       'Data': {
         "message": "Chat room  eliminado",
-        "product" : account
+        "product" : comment
       }
     });
   } catch (error) {
