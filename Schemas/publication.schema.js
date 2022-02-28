@@ -8,7 +8,7 @@ const userId = Joi.string().uuid();
 const createPublicationSchema = Joi.object({
   date: date.required(),
   content: content.required(),
-  userId: userId.required()
+  userID: userId.required()
 });
 
 const updatePublicationSchema = Joi.object({

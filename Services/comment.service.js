@@ -13,7 +13,7 @@ class CommentService{
   generate(){
     const limit = 100;
     for (let index = 0; index < limit; index++)
-      this.accounts.push({
+      this.comments.push({
         id: faker.datatype.uuid(),
         publicationID: faker.datatype.uuid(),
         userID: faker.datatype.uuid(),

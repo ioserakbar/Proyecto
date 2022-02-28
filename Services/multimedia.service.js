@@ -12,9 +12,9 @@ class MultimediaService{
   generate(){
     const limit = 100;
     for (let index = 0; index < limit; index++)
-      this.accounts.push({
+      this.multimedias.push({
         id: faker.datatype.uuid(),
-        commentID: faker.datatype.uuid(),
+        path: faker.internet.url(),
         multimediaID: faker.datatype.uuid()
       });   
   }

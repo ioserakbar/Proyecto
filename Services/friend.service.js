@@ -13,10 +13,11 @@ class FriendService{
   generate(){
     const limit = 100;
     for (let index = 0; index < limit; index++)
-      this.accounts.push({
+      this.Friends.push({
         id: faker.datatype.uuid(),
-        commentID: faker.datatype.uuid(),
-        multimediaID: faker.datatype.uuid()
+        userOne: faker.datatype.uuid(),
+        userTwo: faker.datatype.uuid(),
+        date: faker.date.future()
       });   
   }
 

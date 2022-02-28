@@ -13,9 +13,12 @@ class VideoPlayService{
   generate(){
     const limit = 100;
     for (let index = 0; index < limit; index++)
-      this.accounts.push({
+      this.videoPlays.push({
         id: faker.datatype.uuid(),
-        commentID: faker.datatype.uuid(),
+        date: faker.date.future(),
+        gameID: faker.datatype.uuid(),
+        userID: faker.datatype.uuid(),
+        conten: faker.lorem.sentence(),
         multimediaID: faker.datatype.uuid()
       });   
   }

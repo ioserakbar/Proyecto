@@ -13,10 +13,17 @@ class UserService{
   generate(){
     const limit = 100;
     for (let index = 0; index < limit; index++)
-      this.accounts.push({
+      this.users.push({
         id: faker.datatype.uuid(),
-        commentID: faker.datatype.uuid(),
-        multimediaID: faker.datatype.uuid()
+        name: faker.name.findName(),
+        age: faker.datatype.number(),
+        gender: faker.random.arrayElement(["male", "female", "other"]),
+        voicechat: faker.datatype.boolean(),
+        country: faker.address.country(),
+        schedule: faker.datatype.uuid(),
+        description: faker.lorem.sentence(),
+        profile: faker.lorem.sentence(),  
+        profilePic: faker.internet.avatar()
       });   
   }
 

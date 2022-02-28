@@ -1,9 +1,9 @@
 const express= require('express');
 const router = express.Router();
-const Service = require('../Services/chatroom.service');
+const Service = require('../Services/friend.service');
 const service = new Service();
 const validatorHandler = require('./../Middlewares/validator.handler')
-const { createChatroomSchema, updateChatroomSchema, getValidChatroom } = require('../Schemas/chatroom.schema');
+const { createCommentchema, updateCommentSchema, getValidComment } = require('../Schemas/friend.schema');
 
 
 //GET ALL PRODUCTS
@@ -15,7 +15,7 @@ router.get('/', (req, res, next) => {
     const accounts = service.find(size || 10)
     res.json({
       'success': true,
-      'message': 'Estos son los productos encontrados',
+      'message': 'Esta es la multimedia en los comentarios encontrados',
       'Data': accounts
     });
 
@@ -26,14 +26,14 @@ router.get('/', (req, res, next) => {
 });
  
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createChatroomSchema, 'body'), (req, res, next) => {  
+router.post('/', validatorHandler(createCommentchema, 'body'), (req, res, next) => {  
   try {
     const body = req.body;
     const account = service.create(body);
 
     res.json({
       'success': true, 
-      'message': "El chat room se ha creado con exito", 
+      'message': "El comentario se ha creado con exito", 
       'Data': account 
    });
   } catch (error) {
@@ -44,14 +44,14 @@ router.post('/', validatorHandler(createChatroomSchema, 'body'), (req, res, next
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidChatroom, 'params'),  (req, res, next) => {
+router.get('/:id', validatorHandler(getValidComment, 'params'),  (req, res, next) => {
   try{
     const {id} = req.params;
 
     const account =  service.findOne(id);
     res.json({
       'success': true,
-      'message': 'Este es el chat room encontrado',
+      'message': 'Este es el comentario encontrado',
       'Data': account
     });
   } catch (error){
@@ -62,14 +62,14 @@ router.get('/:id', validatorHandler(getValidChatroom, 'params'),  (req, res, nex
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidChatroom, 'params'), validatorHandler(updateChatroomSchema, 'body'), (req, res, next) => {
+router.patch('/:id', validatorHandler(getValidComment, 'params'), validatorHandler(updateCommentSchema, 'body'), (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
     const { old, changed} = service.update(id, data);
     res.json({
       'success': true,
-      'message': "Se ha actualizado el siguiente chat room",
+      'message': "Se ha actualizado el siguiente comentario",
       'Data': {
         "Original": old,
         "Modificado": changed
@@ -81,13 +81,13 @@ router.patch('/:id', validatorHandler(getValidChatroom, 'params'), validatorHand
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidChatroom, 'params'), (req, res, next) => {
+router.delete('/:id', validatorHandler(getValidComment, 'params'), (req, res, next) => {
   try {
     const { id } = req.params;
     const account = service.delete(id);
     res.json({
       'success': true,
-      'message': "Se ha eliminado este chat room",
+      'message': "Se ha eliminado este comentario",
       'Data': {
         "message": "Chat room  eliminado",
         "product" : account

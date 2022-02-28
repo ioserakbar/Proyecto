@@ -13,10 +13,10 @@ class RecommendedService{
   generate(){
     const limit = 100;
     for (let index = 0; index < limit; index++)
-      this.accounts.push({
+      this.recommendeds.push({
         id: faker.datatype.uuid(),
-        commentID: faker.datatype.uuid(),
-        multimediaID: faker.datatype.uuid()
+        recommendedUser: faker.datatype.uuid(),
+        userID: faker.datatype.uuid()
       });   
   }
 

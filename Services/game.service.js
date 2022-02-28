@@ -13,10 +13,11 @@ class GameService{
   generate(){
     const limit = 100;
     for (let index = 0; index < limit; index++)
-      this.accounts.push({
+      this.Games.push({
         id: faker.datatype.uuid(),
-        commentID: faker.datatype.uuid(),
-        multimediaID: faker.datatype.uuid()
+        name: faker.name.findName(),
+        developers: faker.name.findName(),
+        image: faker.image.image()
       });   
   }
 

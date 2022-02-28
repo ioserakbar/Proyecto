@@ -13,10 +13,11 @@ class PublicationService{
   generate(){
     const limit = 100;
     for (let index = 0; index < limit; index++)
-      this.accounts.push({
+      this.publications.push({
         id: faker.datatype.uuid(),
-        commentID: faker.datatype.uuid(),
-        multimediaID: faker.datatype.uuid()
+        date: faker.datatype.uuid(),
+        content: faker.lorem.sentence(),
+        userID: faker.datatype.uuid()
       });   
   }
 

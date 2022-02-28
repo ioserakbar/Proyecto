@@ -13,10 +13,12 @@ class FavoriteGameService{
   generate(){
     const limit = 100;
     for (let index = 0; index < limit; index++)
-      this.accounts.push({
+      this.FavoriteGames.push({
         id: faker.datatype.uuid(),
-        commentID: faker.datatype.uuid(),
-        multimediaID: faker.datatype.uuid()
+        gameID: faker.datatype.uuid(),
+        userID: faker.datatype.uuid(),
+        ranked: faker.lorem.sentence(),
+        timePlayed: faker.datatype.number()
       });   
   }
 

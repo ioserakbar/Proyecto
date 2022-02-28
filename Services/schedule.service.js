@@ -13,10 +13,15 @@ class ScheduleService{
   generate(){
     const limit = 100;
     for (let index = 0; index < limit; index++)
-      this.accounts.push({
+      this.schedules.push({
         id: faker.datatype.uuid(),
-        commentID: faker.datatype.uuid(),
-        multimediaID: faker.datatype.uuid()
+        lunes: faker.lorem.sentence(),
+        martes: faker.lorem.sentence(),
+        miercoles: faker.lorem.sentence(),
+        jueves: faker.lorem.sentence(),
+        viernes: faker.lorem.sentence(),
+        sabado: faker.lorem.sentence(),
+        domingo: faker.lorem.sentence()
       });   
   }
 

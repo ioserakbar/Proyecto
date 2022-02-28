@@ -13,10 +13,10 @@ class CountryService{
   generate(){
     const limit = 100;
     for (let index = 0; index < limit; index++)
-      this.accounts.push({
+      this.Countries.push({
         id: faker.datatype.uuid(),
-        commentID: faker.datatype.uuid(),
-        multimediaID: faker.datatype.uuid()
+        name: faker.address.country(),
+        flag: faker.image.image()
       });   
   }
 

@@ -9,7 +9,7 @@ const index = Joi.number().integer();
 const createCommentMultimediaSchema = Joi.object({
   gameID: gameID.required(),
   name: name.required(),
-  iamge: image,
+  image: image,
   index: index.required()
 });
 

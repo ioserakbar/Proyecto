@@ -13,10 +13,14 @@ class MessageService{
   generate(){
     const limit = 100;
     for (let index = 0; index < limit; index++)
-      this.accounts.push({
+      this.messages.push({
         id: faker.datatype.uuid(),
-        commentID: faker.datatype.uuid(),
-        multimediaID: faker.datatype.uuid()
+        content: faker.lorem.sentence(),
+        multimediaID: faker.datatype.uuid(),
+        date: faker.date.future(),
+        hour: faker.date.future(),
+        userSenderID: faker.datatype.uuid(),
+        chatRoomID: faker.datatype.uuid(),
       });   
   }
 

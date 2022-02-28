@@ -13,7 +13,7 @@ class CommentMultimediService{
   generate(){
     const limit = 100;
     for (let index = 0; index < limit; index++)
-      this.accounts.push({
+      this.commentMultimedias.push({
         id: faker.datatype.uuid(),
         commentID: faker.datatype.uuid(),
         multimediaID: faker.datatype.uuid()

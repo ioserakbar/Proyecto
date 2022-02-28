@@ -13,10 +13,12 @@ class RankingService{
   generate(){
     const limit = 100;
     for (let index = 0; index < limit; index++)
-      this.accounts.push({
+      this.rankings.push({
         id: faker.datatype.uuid(),
-        commentID: faker.datatype.uuid(),
-        multimediaID: faker.datatype.uuid()
+        gameID: faker.datatype.uuid(),
+        name: faker.name.findName(),
+        image: faker.image.image(),
+        index: faker.random.number()
       });   
   }
 
