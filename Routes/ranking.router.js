@@ -1,9 +1,9 @@
 const express= require('express');
 const router = express.Router();
-const Service = require('../Services/publicationMultimedia.service');
+const Service = require('../Services/ranking.service');
 const service = new Service();
 const validatorHandler = require('./../Middlewares/validator.handler')
-const { createPublicationSchema, updatePublicationSchema, getValidPublication } = require('../Schemas/publicationMultimedia.schema');
+const { createPublicationSchema, updatePublicationSchema, getValidPublication } = require('../Schemas/ranking.schema');
 
 
 //GET ALL PRODUCTS
