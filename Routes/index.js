@@ -1,25 +1,12 @@
 const express = require('express');
-const routerApi = require('./routes');
-//const { logErrors, boomErrorHandler, errorHandler } = require('./middlewares/error.handler');
+const accountsRouter = require('./account.router');
 
-const app = express();
-const port = 3000;
+const routerApi = (app) =>{
 
-//EL ORDEN DE INTANCIA ES IMPORTANTE
-app.use(express.json()); //UTILIZAMOS JSON COMO FORMATO DE DATOS 
-routerApi(app);//RUTAS DE NUESTRAS ENTIDADES
-//MIDDLEWARES CODIGO INTEMEDIARIO (MANEJO DE ERRORES Y VALIDACIONES JOI)
-// app.use(logErrors);
-// app.use(boomErrorHandler);
-// app.use(errorHandler);
+    const router = express.Router();
+    app.use('/api/v1', router);
+    //endpints de la v1
+    router.use('/account', accountsRouter);
+}
 
-
-app.listen(port, () =>{
-  
-  // eslint-disable-next-line no-console
-  console.log("este es mi puerto: " + port);
-});
-
-
-
-
+module.exports = routerApi;
