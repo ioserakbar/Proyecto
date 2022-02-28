@@ -45,4 +45,4 @@ const getValidUserCountry = Joi.object({
   country:country.required()
 });
 
-module.exports = { createUserSchema, updateUserSchema, getValidUser, getValidUserCountry};
+module.exports = { createUserSchema, updateUserSchema, getValidUser, getValidUserCountry };

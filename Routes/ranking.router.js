@@ -1,9 +1,9 @@
 const express= require('express');
 const router = express.Router();
-const Service = require('../Services/recommended.service');
+const Service = require('../Services/publicationMultimedia.service');
 const service = new Service();
 const validatorHandler = require('./../Middlewares/validator.handler')
-const { createRecommendedSchema, updateRecommendedSchema, getValidRecommended } = require('../Schemas/recommended.schema');
+const { createPublicationSchema, updatePublicationSchema, getValidPublication } = require('../Schemas/publicationMultimedia.schema');
 
 
 //GET ALL PRODUCTS
@@ -15,7 +15,7 @@ router.get('/', (req, res, next) => {
     const recommendeds = service.find(size || 10)
     res.json({
       'success': true,
-      'message': 'Estos son los recomendados encontrados',
+      'message': 'Estas son las mutlimedias de las publicaciones encontradas',
       'Data': recommendeds
     });
 
@@ -26,14 +26,14 @@ router.get('/', (req, res, next) => {
 });
  
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createRecommendedSchema, 'body'), (req, res, next) => {  
+router.post('/', validatorHandler(createPublicationSchema, 'body'), (req, res, next) => {  
   try {
     const body = req.body;
     const recommended = service.create(body);
 
     res.json({
       'success': true, 
-      'message': "El recomendado se ha creado con exito", 
+      'message': "La multimedia de la publicacion se ha creado con exito", 
       'Data': recommended 
    });
   } catch (error) {
@@ -44,14 +44,14 @@ router.post('/', validatorHandler(createRecommendedSchema, 'body'), (req, res, n
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidRecommended, 'params'),  (req, res, next) => {
+router.get('/:id', validatorHandler(getValidPublication, 'params'),  (req, res, next) => {
   try{
     const {id} = req.params;
 
     const recommended =  service.findOne(id);
     res.json({
       'success': true,
-      'message': 'Este es el recomendado encontrado',
+      'message': 'Esta es la multimedia de la publicacion encontrada',
       'Data': recommended
     });
   } catch (error){
@@ -62,14 +62,14 @@ router.get('/:id', validatorHandler(getValidRecommended, 'params'),  (req, res, 
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidRecommended, 'params'), validatorHandler(updateRecommendedSchema, 'body'), (req, res, next) => {
+router.patch('/:id', validatorHandler(getValidPublication, 'params'), validatorHandler(updatePublicationSchema, 'body'), (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
     const { old, changed} = service.update(id, data);
     res.json({
       'success': true,
-      'message': "Se ha actualizado el siguiente recomendado",
+      'message': "Se ha actualizado la multimedia de la publicacion encontrada",
       'Data': {
         "Original": old,
         "Modificado": changed
@@ -81,16 +81,16 @@ router.patch('/:id', validatorHandler(getValidRecommended, 'params'), validatorH
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidRecommended, 'params'), (req, res, next) => {
+router.delete('/:id', validatorHandler(getValidPublication, 'params'), (req, res, next) => {
   try {
     const { id } = req.params;
     const recommended = service.delete(id);
     res.json({
       'success': true,
-      'message': "Se ha eliminado este recomendado",
+      'message': "Se ha eliminado la multimedia de esta publicacion",
       'Data': {
-        "message": "Recomendado eliminado",
-        "product" : recommended
+        "message": "Multimedia de la publicaicon eliminada",
+        "Data" : recommended
       }
     });
   } catch (error) {

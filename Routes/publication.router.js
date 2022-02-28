@@ -1,9 +1,9 @@
 const express= require('express');
 const router = express.Router();
-const Service = require('../Services/user.service');
+const Service = require('../Services/publication.service');
 const service = new Service();
 const validatorHandler = require('./../Middlewares/validator.handler')
-const { createUserSchema, updateUserSchema, getValidUser } = require('../Schemas/user.schema');
+const { createPublicationSchema, updatePublicationSchema, getValidPublication } = require('../Schemas/publication.schema');
 
 
 //GET ALL PRODUCTS
@@ -12,11 +12,11 @@ router.get('/', (req, res, next) => {
   try{
 
     const {size} = req.query;
-    const users = service.find(size || 10)
+    const recommendeds = service.find(size || 10)
     res.json({
       'success': true,
-      'message': 'Estos son los usuarios encontrados',
-      'Data': users
+      'message': 'Estas son las publicaciones encontradas',
+      'Data': recommendeds
     });
 
   } catch (error){
@@ -26,15 +26,15 @@ router.get('/', (req, res, next) => {
 });
  
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createUserSchema, 'body'), (req, res, next) => {  
+router.post('/', validatorHandler(createPublicationSchema, 'body'), (req, res, next) => {  
   try {
     const body = req.body;
-    const user = service.create(body);
+    const recommended = service.create(body);
 
     res.json({
       'success': true, 
-      'message': "El usuario se ha creado con exito", 
-      'Data': user 
+      'message': "La publicacion se ha creado con exito", 
+      'Data': recommended 
    });
   } catch (error) {
     next(error);
@@ -44,15 +44,15 @@ router.post('/', validatorHandler(createUserSchema, 'body'), (req, res, next) =>
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidUser, 'params'),  (req, res, next) => {
+router.get('/:id', validatorHandler(getValidPublication, 'params'),  (req, res, next) => {
   try{
     const {id} = req.params;
 
-    const user =  service.findOne(id);
+    const recommended =  service.findOne(id);
     res.json({
       'success': true,
-      'message': 'Este es el usuario encontrado',
-      'Data': user
+      'message': 'Esta es la publicacion encontrada',
+      'Data': recommended
     });
   } catch (error){
     next(error);
@@ -62,14 +62,14 @@ router.get('/:id', validatorHandler(getValidUser, 'params'),  (req, res, next) =
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidUser, 'params'), validatorHandler(updateUserSchema, 'body'), (req, res, next) => {
+router.patch('/:id', validatorHandler(getValidPublication, 'params'), validatorHandler(updatePublicationSchema, 'body'), (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
     const { old, changed} = service.update(id, data);
     res.json({
       'success': true,
-      'message': "Se ha actualizado el siguiente usuario",
+      'message': "Se ha actualizado la publicacion encontrada",
       'Data': {
         "Original": old,
         "Modificado": changed
@@ -81,16 +81,16 @@ router.patch('/:id', validatorHandler(getValidUser, 'params'), validatorHandler(
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidUser, 'params'), (req, res, next) => {
+router.delete('/:id', validatorHandler(getValidPublication, 'params'), (req, res, next) => {
   try {
     const { id } = req.params;
-    const user = service.delete(id);
+    const recommended = service.delete(id);
     res.json({
       'success': true,
-      'message': "Se ha eliminado este usuario",
+      'message': "Se ha eliminado esta publicacion",
       'Data': {
-        "message": "Usuario eliminado",
-        "product" : user
+        "message": "Publicaicon eliminada",
+        "Data" : recommended
       }
     });
   } catch (error) {

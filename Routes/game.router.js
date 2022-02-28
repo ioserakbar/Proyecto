@@ -3,7 +3,7 @@ const router = express.Router();
 const Service = require('../Services/game.service');
 const service = new Service();
 const validatorHandler = require('./../Middlewares/validator.handler')
-const { createCommentchema, updateCommentSchema, getValidComment } = require('../Schemas/game.schema');
+const { createGameSchema, updateGameSchema, getValidGame  } = require('../Schemas/game.schema');
 
 
 //GET ALL PRODUCTS
@@ -26,7 +26,7 @@ router.get('/', (req, res, next) => {
 });
  
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createCommentchema, 'body'), (req, res, next) => {  
+router.post('/', validatorHandler(createGameSchema, 'body'), (req, res, next) => {  
   try {
     const body = req.body;
     const game = service.create(body);
@@ -44,7 +44,7 @@ router.post('/', validatorHandler(createCommentchema, 'body'), (req, res, next) 
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidComment, 'params'),  (req, res, next) => {
+router.get('/:id', validatorHandler(getValidGame, 'params'),  (req, res, next) => {
   try{
     const {id} = req.params;
 
@@ -62,7 +62,7 @@ router.get('/:id', validatorHandler(getValidComment, 'params'),  (req, res, next
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidComment, 'params'), validatorHandler(updateCommentSchema, 'body'), (req, res, next) => {
+router.patch('/:id', validatorHandler(getValidGame, 'params'), validatorHandler(updateGameSchema, 'body'), (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
@@ -81,7 +81,7 @@ router.patch('/:id', validatorHandler(getValidComment, 'params'), validatorHandl
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidComment, 'params'), (req, res, next) => {
+router.delete('/:id', validatorHandler(getValidGame, 'params'), (req, res, next) => {
   try {
     const { id } = req.params;
     const game = service.delete(id);

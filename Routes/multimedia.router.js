@@ -3,7 +3,7 @@ const router = express.Router();
 const Service = require('../Services/multimedia.service');
 const service = new Service();
 const validatorHandler = require('./../Middlewares/validator.handler')
-const { createCommentchema, updateCommentSchema, getValidComment } = require('../Schemas/multimedia.schema');
+const { createMultimediaSchema, updateMultimediaSchema, getValidMultimedia} = require('../Schemas/multimedia.schema');
 
 
 //GET ALL PRODUCTS
@@ -26,7 +26,7 @@ router.get('/', (req, res, next) => {
 });
  
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createCommentchema, 'body'), (req, res, next) => {  
+router.post('/', validatorHandler(createMultimediaSchema, 'body'), (req, res, next) => {  
   try {
     const body = req.body;
     const multimedia = service.create(body);
@@ -44,7 +44,7 @@ router.post('/', validatorHandler(createCommentchema, 'body'), (req, res, next) 
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidComment, 'params'),  (req, res, next) => {
+router.get('/:id', validatorHandler(getValidMultimedia, 'params'),  (req, res, next) => {
   try{
     const {id} = req.params;
 
@@ -62,7 +62,7 @@ router.get('/:id', validatorHandler(getValidComment, 'params'),  (req, res, next
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidComment, 'params'), validatorHandler(updateCommentSchema, 'body'), (req, res, next) => {
+router.patch('/:id', validatorHandler(getValidMultimedia, 'params'), validatorHandler(updateMultimediaSchema, 'body'), (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
@@ -81,7 +81,7 @@ router.patch('/:id', validatorHandler(getValidComment, 'params'), validatorHandl
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidComment, 'params'), (req, res, next) => {
+router.delete('/:id', validatorHandler(getValidMultimedia, 'params'), (req, res, next) => {
   try {
     const { id } = req.params;
     const multimedia = service.delete(id);
