@@ -1,6 +1,10 @@
 const faker = require('faker');
-
 const boom = require('@hapi/boom');
+const AccountModel = require('../Models/account.model');
+
+const errNotFound = "No se encontro el catalogo deseado";
+const errEmpty = "Aún no hay cuentas creadas";
+
 
 class AccountService{
 
@@ -23,23 +27,31 @@ class AccountService{
   }
 
   //FIND ALL INFO
-  find(size){
-    const accounts = this.accounts.filter((item, index) => item && index < size);
+  async find(limit, filter){
+    
+    let accounts = await AccountModel.find(filter);
+    
     if(!accounts)
-      throw boom.notFound("No se encontro el catalogo deseado");
+      throw boom.notFound(errNotFound);
     else if (accounts.length <= 0 )
-      throw boom.notFound("Aún no hay cuentas creadas");
+      throw boom.notFound(errEmpty);
+
+    accounts = accounts.filter((item, index) => item && index < limit);
+    
     return accounts;
+
   }
 
   //CREATE INFO
-  create(data){
-    const newAccount = {
+  async create(data){
+    const info = {
       id: faker.datatype.uuid(),
       ...data //PASA TODOS LOS ELEMENTOS Y LOS COMBINA
     }
-    this.accounts.push(newAccount);
-    return newAccount;
+    const newAccount = new AccountModel(info);
+    await newAccount.save(); 
+
+    return info;
   }
 
   //FIND SPECIFIC ACCOUNT

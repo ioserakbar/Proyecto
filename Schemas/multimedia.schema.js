@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 const id = Joi.string().uuid();
 const path = Joi.string();
-const extention = Joi.string().min(3).max(4);
+const extention = Joi.string().min(3).max(5);
 
 const createMultimediaSchema = Joi.object({
   path: path.required(),

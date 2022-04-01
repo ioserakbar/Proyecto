@@ -7,12 +7,14 @@ const { createAccountSchema, updateAccountSchema, getValidAccount } = require('.
 
 
 //GET ALL PRODUCTS
-router.get('/', (req, res, next) => {
+router.get('/',async (req, res, next) => {
 
   try{
 
     const {size} = req.query;
-    const accounts = service.find(size || 10)
+    const filter = req.body;
+    
+    const accounts = await service.find(size || 10, filter);
     res.json({
       'success': true,
       'message': 'Estas son las cuentas encontradas',

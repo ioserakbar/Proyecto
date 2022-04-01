@@ -1,9 +1,12 @@
 const express = require('express');
 const routerApi = require('./Routes');
 const { logErrors, boomErrorHandler, errorHandler } = require('./Middlewares/error.handler');
-
+const db = require('./db');
+const {DBCONNECTION} = require('./consts.json');
 const app = express();
 const port = 3001;
+
+db(DBCONNECTION);
 
 //EL ORDEN DE INTANCIA ES IMPORTANTE
 app.use(express.json()); //UTILIZAMOS JSON COMO FORMATO DE DATOS 
