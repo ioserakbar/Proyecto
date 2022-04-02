@@ -1,85 +1,104 @@
-const faker = require('faker');
-
 const boom = require('@hapi/boom');
 
+const FavoriteGameModel = require('../Models/favoritegames.model');
+
+const errNotFound = "No se logró encontrar lo buscado";
+const errEmpty = "Aún no hay cuentas creadas";
 class FavoriteGameService{
 
-  constructor(){
-    this.FavoriteGames = [];
-    this.generate();
-  }
-
-  //GENERATE RANDOM INFO 
-  generate(){
-    const limit = 100;
-    for (let index = 0; index < limit; index++)
-      this.FavoriteGames.push({
-        id: faker.datatype.uuid(),
-        gameID: faker.datatype.uuid(),
-        userID: faker.datatype.uuid(),
-        ranked: faker.lorem.sentence(),
-        timePlayed: faker.datatype.number()
-      });   
-  }
-
   //FIND ALL INFO
-  find(size){
-    const FavoriteGames = this.FavoriteGames.filter((item, index) => item && index < size);
-    if(!FavoriteGames)
-      throw boom.notFound("No se encontro el catalogo deseado");
-    else if (FavoriteGames.length <= 0 )
-      throw boom.notFound("Aún no hay cuentas creadas");
-    return FavoriteGames;
+  async find(limit, filter){
+
+    let favoritesGames = await FavoriteGameModel.find(filter);
+    
+
+    if(favoritesGames == undefined || favoritesGames == null)
+      throw boom.notFound(errNotFound);
+    else if (favoritesGames.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    favoritesGames = favoritesGames.filter((item, index) => item && index < limit);
+    return favoritesGames;
+
   }
 
   //CREATE INFO
-  create(data){
-    const newFavoriteGame = {
-      id: faker.datatype.uuid(),
-      ...data //PASA TODOS LOS ELEMENTOS Y LOS COMBINA
-    }
-    this.FavoriteGames.push(newFavoriteGame);
-    return newFavoriteGame;
+  async create(data){
+    const newFavoriteGame = new FavoriteGameModel(data);
+    await newFavoriteGame.save(); 
+    return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  findOne(id){
-    const favoriteGame = this.FavoriteGames.find((item) => item.id === id)
-    if(!favoriteGame)
-      throw boom.notFound('La cuenta no fue encontrada');
+  async findOne(id){
+
+    const favoriteGame = await FavoriteGameModel.findOne({
+      _id:id
+    })
+
+    if(favoriteGame == undefined || favoriteGame == null)
+      throw boom.notFound(errNotFound);
+    else if (favoriteGame.length <= 0 )
+      throw boom.notFound(errEmpty);
+
     return favoriteGame;
 
   }
 
   //EDIT SPECIFIC ACCOUNT
-  update(id, changes){
-    const index = this.FavoriteGames.findIndex(item => item.id === id);
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+  async update(id, changes){
+
+    let favoriteGame = await FavoriteGameModel.findOne({
+      _id:id
+    });
     
-    var currentFavoriteGame = this.FavoriteGames[index];
-    this.FavoriteGames[index] =  {
-      ...currentFavoriteGame, 
-      ...changes
+    if(favoriteGame == undefined || favoriteGame == null)
+      throw boom.notFound(errNotFound);
+    if(favoriteGame.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    let originalFavoriteGame = {
+      gameID:favoriteGame.gameID,
+      userID:favoriteGame.userID,
+      ranked:favoriteGame.ranked,
+      timePlayed:favoriteGame.timePlayed,
     };
 
+    const {gameID, userID, ranked, timePlayed} = changes;
+
+    if(gameID)
+      favoriteGame.gameID = gameID
+    if(userID)
+      favoriteGame.userID = userID
+    if(ranked)
+      favoriteGame.ranked = ranked
+    if(timePlayed)
+      favoriteGame.timePlayed = timePlayed;
+
+    await favoriteGame.save();
+    
     return {
-      old : currentFavoriteGame, 
-      changed: this.FavoriteGames[index]
+      old : originalFavoriteGame, 
+      changed: favoriteGame
     };
   }
 
-  delete(id){
+  async delete(id){
     
-    const index = this.FavoriteGames.findIndex(item => item.id === id)
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+    let favoriteGame = await FavoriteGameModel.findOne({
+      _id:id
+    });
 
-    const currentFavoriteGame = this.FavoriteGames[index];
+    const { deletedCount } = await FavoriteGameModel.deleteOne({
+      _id:id
+    });
 
-    this.FavoriteGames.splice(index, 1);
-    return currentFavoriteGame
+    if(deletedCount <= 0 )
+      throw boom.notFound(errEmpty);
+    
+    return favoriteGame;
   }
+   
    
 }
 

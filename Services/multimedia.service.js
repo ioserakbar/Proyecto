@@ -1,82 +1,96 @@
-const faker = require('faker');
 
 const boom = require('@hapi/boom');
-
+const MessageModel = require("../Models/multimedia.model")
+const errNotFound = "No se logró encontrar lo buscado";
+const errEmpty = "Aún no hay cuentas creadas";
 class MultimediaService{
-  constructor(){
-    this.multimedias = [];
-    this.generate();
-  }
-
-  //GENERATE RANDOM INFO 
-  generate(){
-    const limit = 100;
-    for (let index = 0; index < limit; index++)
-      this.multimedias.push({
-        id: faker.datatype.uuid(),
-        path: faker.internet.url(),
-        multimediaID: faker.datatype.uuid()
-      });   
-  }
-
   //FIND ALL INFO
-  find(size){
-    const multimedias = this.multimedias.filter((item, index) => item && index < size);
-    if(!multimedias)
-      throw boom.notFound("No se encontro el catalogo deseado");
+  async find(limit, filter){
+
+    let multimedias = await MessageModel.find(filter);
+    
+
+    if(multimedias == undefined || multimedias == null)
+      throw boom.notFound(errNotFound);
     else if (multimedias.length <= 0 )
-      throw boom.notFound("Aún no hay cuentas creadas");
+      throw boom.notFound(errEmpty);
+
+    multimedias = multimedias.filter((item, index) => item && index < limit);
     return multimedias;
+
   }
 
   //CREATE INFO
-  create(data){
-    const newmultimedia = {
-      id: faker.datatype.uuid(),
-      ...data //PASA TODOS LOS ELEMENTOS Y LOS COMBINA
-    }
-    this.multimedias.push(newmultimedia);
-    return newmultimedia;
+  async create(data){
+    const newMultimedia = new MessageModel(data);
+    await newMultimedia.save(); 
+    return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  findOne(id){
-    const multimedia = this.multimedias.find((item) => item.id === id)
-    if(!multimedia)
-      throw boom.notFound('La cuenta no fue encontrada');
+  async findOne(id){
+
+    const multimedia = await MessageModel.findOne({
+      _id:id
+    })
+
+    if(multimedia == undefined || multimedia == null)
+      throw boom.notFound(errNotFound);
+    else if (multimedia.length <= 0 )
+      throw boom.notFound(errEmpty);
+
     return multimedia;
 
   }
 
   //EDIT SPECIFIC ACCOUNT
-  update(id, changes){
-    const index = this.multimedias.findIndex(item => item.id === id);
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+  async update(id, changes){
+
+    let multimedia = await MessageModel.findOne({
+      _id:id
+    });
     
-    var currentmultimedia = this.multimedias[index];
-    this.multimedias[index] =  {
-      ...currentmultimedia, 
-      ...changes
+    if(multimedia == undefined || multimedia == null)
+      throw boom.notFound(errNotFound);
+    if(multimedia.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    let originalMultimedia = {
+      path:multimedia.content,
+      extention:multimedia.multimediaID,
     };
 
+    const {path, extention} = changes;
+
+    if(path)
+      multimedia.path = path
+    if(extention)
+      multimedia.extention = extention
+
+    await multimedia.save();
+    
     return {
-      old : currentmultimedia, 
-      changed: this.multimedias[index]
+      old : originalMultimedia, 
+      changed: multimedia
     };
   }
 
-  delete(id){
+  async delete(id){
     
-    const index = this.multimedias.findIndex(item => item.id === id)
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+    let multimedia = await MessageModel.findOne({
+      _id:id
+    });
 
-    const currentmultimedia = this.multimedias[index];
+    const { deletedCount } = await MessageModel.deleteOne({
+      _id:id
+    });
 
-    this.multimedias.splice(index, 1);
-    return currentmultimedia
+    if(deletedCount <= 0 )
+      throw boom.notFound(errEmpty);
+    
+    return multimedia;
   }
+    
    
 }
 

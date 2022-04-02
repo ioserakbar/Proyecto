@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
-const id = Joi.string().uuid();
-const userID = Joi.string().uuid();
+const id = Joi.string();
+const userID = Joi.string();
 const email = Joi.string().email();
 const type = Joi.string().alphanum().min(3).max(20);
 

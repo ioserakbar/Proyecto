@@ -1,8 +1,8 @@
 const Joi = require('joi');
 
-const id = Joi.string().uuid();
-const commentID = Joi.string().uuid();
-const multimediaID = Joi.string().uuid();
+const id = Joi.string();
+const commentID = Joi.string();
+const multimediaID = Joi.string();
 
 const createCommentMultimediaSchema = Joi.object({
   commentID: commentID.required(),

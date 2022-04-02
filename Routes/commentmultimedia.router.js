@@ -7,12 +7,13 @@ const { createCommentMultimediaSchema, updateCommentMultimediaSchema, getValidCo
 
 
 //GET ALL PRODUCTS
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
 
   try{
 
     const {size} = req.query;
-    const commentMultimedias = service.find(size || 10)
+    const filter = req.body;
+    const commentMultimedias = await service.find(size || 10, filter);
     res.json({
       'success': true,
       'message': 'Esta es la multimedia en los comentarios encontrados',
@@ -26,10 +27,10 @@ router.get('/', (req, res, next) => {
 });
  
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createCommentMultimediaSchema, 'body'), (req, res, next) => {  
+router.post('/', validatorHandler(createCommentMultimediaSchema, 'body'), async (req, res, next) => {  
   try {
     const body = req.body;
-    const commentMultimedia = service.create(body);
+    const commentMultimedia = await service.create(body);
 
     res.json({
       'success': true, 
@@ -44,11 +45,11 @@ router.post('/', validatorHandler(createCommentMultimediaSchema, 'body'), (req, 
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidCommentMultimedia, 'params'),  (req, res, next) => {
+router.get('/:id', validatorHandler(getValidCommentMultimedia, 'params'),  async (req, res, next) => {
   try{
     const {id} = req.params;
 
-    const commentMultimedia =  service.findOne(id);
+    const commentMultimedia =  await service.findOne(id);
     res.json({
       'success': true,
       'message': 'Este es la multimedia del comentario encontrado',
@@ -62,11 +63,11 @@ router.get('/:id', validatorHandler(getValidCommentMultimedia, 'params'),  (req,
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidCommentMultimedia, 'params'), validatorHandler(updateCommentMultimediaSchema, 'body'), (req, res, next) => {
+router.patch('/:id', validatorHandler(getValidCommentMultimedia, 'params'), validatorHandler(updateCommentMultimediaSchema, 'body'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
-    const { old, changed} = service.update(id, data);
+    const { old, changed} = await service.update(id, data);
     res.json({
       'success': true,
       'message': "Se ha actualizado la siguiente multimedia del comentario",
@@ -81,10 +82,10 @@ router.patch('/:id', validatorHandler(getValidCommentMultimedia, 'params'), vali
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidCommentMultimedia, 'params'), (req, res, next) => {
+router.delete('/:id', validatorHandler(getValidCommentMultimedia, 'params'), async (req, res, next) => {
   try {
     const { id } = req.params;
-    const commentMultimedia = service.delete(id);
+    const commentMultimedia = await service.delete(id);
     res.json({
       'success': true,
       'message': "Se ha eliminado la multimedia de este comentario",

@@ -1,82 +1,95 @@
-const faker = require('faker');
-
 const boom = require('@hapi/boom');
+const CommentMultimediaModel = require('../Models/commentmultimedia.model');
+
+const errNotFound = "No se logró encontrar lo buscado";
+const errEmpty = "Aún no hay cuentas creadas";
 
 class CommentMultimediService{
 
-  constructor(){
-    this.commentMultimedias = [];
-    this.generate();
-  }
-
-  //GENERATE RANDOM INFO 
-  generate(){
-    const limit = 100;
-    for (let index = 0; index < limit; index++)
-      this.commentMultimedias.push({
-        id: faker.datatype.uuid(),
-        commentID: faker.datatype.uuid(),
-        multimediaID: faker.datatype.uuid()
-      });   
-  }
-
   //FIND ALL INFO
-  find(size){
-    const commentMultimedias = this.commentMultimedias.filter((item, index) => item && index < size);
-    if(!commentMultimedias)
-      throw boom.notFound("No se encontro el catalogo deseado");
-    else if (commentMultimedias.length <= 0 )
-      throw boom.notFound("Aún no hay cuentas creadas");
-    return commentMultimedias;
+  async find(limit, filter){
+    
+    let MultimediaComments = await CommentMultimediaModel.find(filter);
+    
+    if(MultimediaComments == undefined || MultimediaComments == null)
+      throw boom.notFound(errNotFound);
+    if(MultimediaComments.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    MultimediaComments = MultimediaComments.filter((item, index) => item && index < limit);
+    
+    return MultimediaComments;
+
   }
 
   //CREATE INFO
-  create(data){
-    const newCommentMultimedia = {
-      id: faker.datatype.uuid(),
-      ...data //PASA TODOS LOS ELEMENTOS Y LOS COMBINA
-    }
-    this.commentMultimedias.push(newCommentMultimedia);
-    return newCommentMultimedia;
+  async create(data){
+
+    const newMultimediaComment = new CommentMultimediaModel(data);
+    await newMultimediaComment.save(); 
+    return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  findOne(id){
-    const commentMultimedia = this.commentMultimedias.find((item) => item.id === id)
-    if(!commentMultimedia)
-      throw boom.notFound('La cuenta no fue encontrada');
-    return commentMultimedia;
+  async findOne(id){
+    const MultimediaComment = await CommentMultimediaModel.findOne({
+      _id:id
+    })
+
+    if(MultimediaComment == undefined || MultimediaComment == null)
+      throw boom.notFound(errNotFound);
+    if(MultimediaComment.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    return MultimediaComment;
 
   }
 
   //EDIT SPECIFIC ACCOUNT
-  update(id, changes){
-    const index = this.commentMultimedias.findIndex(item => item.id === id);
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+  async update(id, changes){
     
-    var currentcommentMultimedia = this.commentMultimedias[index];
-    this.commentMultimedias[index] =  {
-      ...currentcommentMultimedia, 
-      ...changes
+    let MultimediaComment = await CommentMultimediaModel.findOne({
+      _id:id
+    });
+
+    if(MultimediaComment == undefined || MultimediaComment == null)
+      throw boom.notFound(errNotFound);
+    if(MultimediaComment.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    let originalMultimediaComment = {
+      commentID:MultimediaComment.commentID,
+      multimediaID:MultimediaComment.multimediaID
     };
 
+    const {commentID, multimediaID} = changes;
+
+    if(commentID)
+      MultimediaComment.commentID = commentID
+    if(multimediaID)
+      MultimediaComment.multimediaID = multimediaID
+
+    await MultimediaComment.save();
+    
     return {
-      old : currentcommentMultimedia, 
-      changed: this.commentMultimedias[index]
+      old : originalMultimediaComment, 
+      changed: MultimediaComment
     };
   }
 
-  delete(id){
+  async delete(id){
+    let MultimediaComment = await CommentMultimediaModel.findOne({
+      _id:id
+    });
+
+    const { deletedCount } = await CommentMultimediaModel.deleteOne({
+      _id:id
+    });
+
+    if(deletedCount <= 0 )
+      throw boom.notFound(errEmpty);
     
-    const index = this.commentMultimedias.findIndex(item => item.id === id)
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
-
-    const currentcommentMultimedia = this.commentMultimedias[index];
-
-    this.commentMultimedias.splice(index, 1);
-    return currentcommentMultimedia
+    return MultimediaComment;
   }
    
 }

@@ -1,82 +1,95 @@
-const faker = require('faker');
-
 const boom = require('@hapi/boom');
 
+const NotRecommendedModel = require("../Models/notrecommended.model")
+const errNotFound = "No se logró encontrar lo buscado";
+const errEmpty = "Aún no hay cuentas creadas";
 class NotRecommendedService{
 
-  constructor(){
-    this.notRecommendeds = [];
-    this.generate();
-  }
-
-  //GENERATE RANDOM INFO 
-  generate(){
-    const limit = 100;
-    for (let index = 0; index < limit; index++)
-      this.notRecommendeds.push({
-        id: faker.datatype.uuid(),
-        notRecomndedeUser: faker.datatype.uuid(),
-        userID: faker.datatype.uuid()
-      });   
-  }
-
   //FIND ALL INFO
-  find(size){
-    const notRecommendeds = this.notRecommendeds.filter((item, index) => item && index < size);
-    if(!notRecommendeds)
-      throw boom.notFound("No se encontro el catalogo deseado");
+  async find(limit, filter){
+
+    let notRecommendeds = await NotRecommendedModel.find(filter);
+    
+
+    if(notRecommendeds == undefined || notRecommendeds == null)
+      throw boom.notFound(errNotFound);
     else if (notRecommendeds.length <= 0 )
-      throw boom.notFound("Aún no hay cuentas creadas");
+      throw boom.notFound(errEmpty);
+
+    notRecommendeds = notRecommendeds.filter((item, index) => item && index < limit);
     return notRecommendeds;
+
   }
 
   //CREATE INFO
-  create(data){
-    const newnotRecommended = {
-      id: faker.datatype.uuid(),
-      ...data //PASA TODOS LOS ELEMENTOS Y LOS COMBINA
-    }
-    this.notRecommendeds.push(newnotRecommended);
-    return newnotRecommended;
+  async create(data){
+    const NewNotRecommended = new NotRecommendedModel(data);
+    await NewNotRecommended.save(); 
+    return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  findOne(id){
-    const notRecommended = this.notRecommendeds.find((item) => item.id === id)
-    if(!notRecommended)
-      throw boom.notFound('La cuenta no fue encontrada');
+  async findOne(id){
+
+    const notRecommended = await NotRecommendedModel.findOne({
+      _id:id
+    })
+
+    if(notRecommended == undefined || notRecommended == null)
+      throw boom.notFound(errNotFound);
+    else if (notRecommended.length <= 0 )
+      throw boom.notFound(errEmpty);
+
     return notRecommended;
 
   }
 
   //EDIT SPECIFIC ACCOUNT
-  update(id, changes){
-    const index = this.notRecommendeds.findIndex(item => item.id === id);
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+  async update(id, changes){
+
+    let notRecommended = await NotRecommendedModel.findOne({
+      _id:id
+    });
     
-    var currentnotRecommended = this.notRecommendeds[index];
-    this.notRecommendeds[index] =  {
-      ...currentnotRecommended, 
-      ...changes
+    if(notRecommended == undefined || notRecommended == null)
+      throw boom.notFound(errNotFound);
+    if(notRecommended.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    let originalNotRecommended = {
+      notRecommendedUser:notRecommended.notRecommendedUser,
+      userID:notRecommended.userID,
     };
 
+    const {notRecommendedUser, userID} = changes;
+
+    if(notRecommendedUser)
+      notRecommended.notRecommendedUser = notRecommendedUser
+    if(userID)
+      notRecommended.userID = userID
+
+    await notRecommended.save();
+    
     return {
-      old : currentnotRecommended, 
-      changed: this.notRecommendeds[index]
+      old : originalNotRecommended, 
+      changed: notRecommended
     };
   }
 
-  delete(id){
+  async delete(id){
     
-    const index = this.notRecommendeds.findIndex(item => item.id === id)
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+    let notRecommended = await NotRecommendedModel.findOne({
+      _id:id
+    });
 
-    const currentnotRecommended = this.notRecommendeds[index];
+    const { deletedCount } = await NotRecommendedModel.deleteOne({
+      _id:id
+    });
 
-    this.notRecommendeds.splice(index, 1);
-    return currentnotRecommended
+    if(deletedCount <= 0 )
+      throw boom.notFound(errEmpty);
+    
+    return notRecommended;
   }
    
 }

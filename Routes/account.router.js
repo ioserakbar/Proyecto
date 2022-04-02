@@ -28,10 +28,10 @@ router.get('/',async (req, res, next) => {
 });
  
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createAccountSchema, 'body'), (req, res, next) => {  
+router.post('/', validatorHandler(createAccountSchema, 'body'),async (req, res, next) => {  
   try {
     const body = req.body;
-    const account = service.create(body);
+    const account = await service.create(body);
 
     res.json({
       'success': true, 
@@ -46,11 +46,11 @@ router.post('/', validatorHandler(createAccountSchema, 'body'), (req, res, next)
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidAccount, 'params'),  (req, res, next) => {
+router.get('/:id', validatorHandler(getValidAccount, 'params'),async  (req, res, next) => {
   try{
     const {id} = req.params;
 
-    const account =  service.findOne(id);
+    const account = await service.findOne(id);
     res.json({
       'success': true,
       'message': 'Este es la cuenta encontrada',
@@ -64,11 +64,11 @@ router.get('/:id', validatorHandler(getValidAccount, 'params'),  (req, res, next
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidAccount, 'params'), validatorHandler(updateAccountSchema, 'body'), (req, res, next) => {
+router.patch('/:id', validatorHandler(getValidAccount, 'params'), validatorHandler(updateAccountSchema, 'body'),async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
-    const { old, changed} = service.update(id, data);
+    const { old, changed} = await service.update(id, data);
     res.json({
       'success': true,
       'message': "Se ha actualizado la siguiente cuenta",
@@ -83,10 +83,10 @@ router.patch('/:id', validatorHandler(getValidAccount, 'params'), validatorHandl
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidAccount, 'params'), (req, res, next) => {
+router.delete('/:id', validatorHandler(getValidAccount, 'params'),async (req, res, next) => {
   try {
     const { id } = req.params;
-    const account = service.delete(id);
+    const account = await service.delete(id);
     res.json({
       'success': true,
       'message': "Se ha eliminado esta cuenta",

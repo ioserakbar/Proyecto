@@ -7,12 +7,13 @@ const { createPublicationSchema, updatePublicationSchema, getValidPublication } 
 
 
 //GET ALL PRODUCTS
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
 
   try{
 
     const {size} = req.query;
-    const recommendeds = service.find(size || 10)
+    const filter = req.body;
+    const recommendeds = await service.find(size || 10, filter);
     res.json({
       'success': true,
       'message': 'Estas son las mutlimedias de las publicaciones encontradas',
@@ -26,10 +27,10 @@ router.get('/', (req, res, next) => {
 });
  
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createPublicationSchema, 'body'), (req, res, next) => {  
+router.post('/', validatorHandler(createPublicationSchema, 'body'), async (req, res, next) => {  
   try {
     const body = req.body;
-    const recommended = service.create(body);
+    const recommended = await service.create(body);
 
     res.json({
       'success': true, 
@@ -44,11 +45,11 @@ router.post('/', validatorHandler(createPublicationSchema, 'body'), (req, res, n
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidPublication, 'params'),  (req, res, next) => {
+router.get('/:id', validatorHandler(getValidPublication, 'params'),  async (req, res, next) => {
   try{
     const {id} = req.params;
 
-    const recommended =  service.findOne(id);
+    const recommended =  await service.findOne(id);
     res.json({
       'success': true,
       'message': 'Esta es la multimedia de la publicacion encontrada',
@@ -62,11 +63,11 @@ router.get('/:id', validatorHandler(getValidPublication, 'params'),  (req, res, 
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidPublication, 'params'), validatorHandler(updatePublicationSchema, 'body'), (req, res, next) => {
+router.patch('/:id', validatorHandler(getValidPublication, 'params'), validatorHandler(updatePublicationSchema, 'body'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
-    const { old, changed} = service.update(id, data);
+    const { old, changed} = await service.update(id, data);
     res.json({
       'success': true,
       'message': "Se ha actualizado la multimedia de la publicacion encontrada",
@@ -81,10 +82,10 @@ router.patch('/:id', validatorHandler(getValidPublication, 'params'), validatorH
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidPublication, 'params'), (req, res, next) => {
+router.delete('/:id', validatorHandler(getValidPublication, 'params'), async (req, res, next) => {
   try {
     const { id } = req.params;
-    const recommended = service.delete(id);
+    const recommended = await service.delete(id);
     res.json({
       'success': true,
       'message': "Se ha eliminado la multimedia de esta publicacion",

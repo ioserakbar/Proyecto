@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
-const id = Joi.string().uuid();
-const notRecommendeUser = Joi.string().uuid();
+const id = Joi.string();
+const notRecommendeUser = Joi.string();
 const userID = Joi.string().uuid();
 
 const createNotRecommendedSchema = Joi.object({

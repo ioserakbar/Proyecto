@@ -1,8 +1,8 @@
 const Joi = require('joi');
 
-const id = Joi.string().uuid();
-const publicationID = Joi.string().uuid();
-const userID = Joi.string().uuid();
+const id = Joi.string();
+const publicationID = Joi.string();
+const userID = Joi.string();
 const content = Joi.string().min(1).max(250);
 
 const createCommentchema = Joi.object({

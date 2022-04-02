@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 
 
-const id = Joi.string().uuid();
+const id = Joi.string();
 const lunes = Joi.string().pattern(/^([0-9]{2}[:][0-9]{2}[ ]{1}[-]{1}[ ]{1}[0-9]{2}[:][0-9]{2})$/).min(13).max(13);
 const martes = Joi.string().pattern(/^([0-9]{2}[:][0-9]{2}[ ]{1}[-]{1}[ ]{1}[0-9]{2}[:][0-9]{2})$/).min(13).max(13);
 const miercoles = Joi.string().pattern(/^([0-9]{2}[:][0-9]{2}[ ]{1}[-]{1}[ ]{1}[0-9]{2}[:][0-9]{2})$/).min(13).max(13);

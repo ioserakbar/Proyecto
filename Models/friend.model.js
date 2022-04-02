@@ -12,6 +12,7 @@ const  friendSchema = new Schema ({
 const modelFriend = mongoose.model('friend', friendSchema);
 module.exports = modelFriend;
 
+
 /**const id = Joi.string().uuid();
 const userOne = Joi.string().uuid();
 const userTwo = Joi.string().uuid();

@@ -7,12 +7,13 @@ const { createCommentchema, updateCommentSchema, getValidComment } = require('..
 
 
 //GET ALL PRODUCTS
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
 
   try{
 
     const {size} = req.query;
-    const comments = service.find(size || 10)
+    const filter = req.body;
+    const comments = await service.find(size || 10, filter);
     res.json({
       'success': true,
       'message': 'Estos son los comentarios encontrados',
@@ -26,10 +27,10 @@ router.get('/', (req, res, next) => {
 });
  
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createCommentchema, 'body'), (req, res, next) => {  
+router.post('/', validatorHandler(createCommentchema, 'body'), async (req, res, next) => {  
   try {
     const body = req.body;
-    const comment = service.create(body);
+    const comment = await service.create(body);
 
     res.json({
       'success': true, 
@@ -44,11 +45,11 @@ router.post('/', validatorHandler(createCommentchema, 'body'), (req, res, next) 
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidComment, 'params'),  (req, res, next) => {
+router.get('/:id', validatorHandler(getValidComment, 'params'),  async (req, res, next) => {
   try{
     const {id} = req.params;
 
-    const comment =  service.findOne(id);
+    const comment =  await service.findOne(id);
     res.json({
       'success': true,
       'message': 'Este es el comentario encontrado',
@@ -62,11 +63,11 @@ router.get('/:id', validatorHandler(getValidComment, 'params'),  (req, res, next
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidComment, 'params'), validatorHandler(updateCommentSchema, 'body'), (req, res, next) => {
+router.patch('/:id', validatorHandler(getValidComment, 'params'), validatorHandler(updateCommentSchema, 'body'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
-    const { old, changed} = service.update(id, data);
+    const { old, changed} = await service.update(id, data);
     res.json({
       'success': true,
       'message': "Se ha actualizado el siguiente comentario",
@@ -81,10 +82,10 @@ router.patch('/:id', validatorHandler(getValidComment, 'params'), validatorHandl
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidComment, 'params'), (req, res, next) => {
+router.delete('/:id', validatorHandler(getValidComment, 'params'), async (req, res, next) => {
   try {
     const { id } = req.params;
-    const comment = service.delete(id);
+    const comment = await service.delete(id);
     res.json({
       'success': true,
       'message': "Se ha eliminado este comentario",

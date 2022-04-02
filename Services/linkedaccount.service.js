@@ -1,83 +1,98 @@
-const faker = require('faker');
-
 const boom = require('@hapi/boom');
 
+const LinkedAccountModel = require("../Models/linkedaccount.model")
+const errNotFound = "No se logró encontrar lo buscado";
+const errEmpty = "Aún no hay cuentas creadas";
 class LinkedAccountService{
 
-  constructor(){
-    this.linkedAccounts = [];
-    this.generate();
-  }
-
-  //GENERATE RANDOM INFO 
-  generate(){
-    const limit = 100;
-    for (let index = 0; index < limit; index++)
-      this.linkedAccounts.push({
-        id: faker.datatype.uuid(),
-        userID: faker.datatype.uuid(),
-        email: faker.internet.email(),
-        type: faker.lorem.sentence()
-      });   
-  }
-
   //FIND ALL INFO
-  find(size){
-    const linkedAccounts = this.linkedAccounts.filter((item, index) => item && index < size);
-    if(!linkedAccounts)
-      throw boom.notFound("No se encontro el catalogo deseado");
+  async find(limit, filter){
+
+    let linkedAccounts = await LinkedAccountModel.find(filter);
+    
+
+    if(linkedAccounts == undefined || linkedAccounts == null)
+      throw boom.notFound(errNotFound);
     else if (linkedAccounts.length <= 0 )
-      throw boom.notFound("Aún no hay cuentas creadas");
+      throw boom.notFound(errEmpty);
+
+    linkedAccounts = linkedAccounts.filter((item, index) => item && index < limit);
     return linkedAccounts;
+
   }
 
   //CREATE INFO
-  create(data){
-    const newlinkedAccount = {
-      id: faker.datatype.uuid(),
-      ...data //PASA TODOS LOS ELEMENTOS Y LOS COMBINA
-    }
-    this.linkedAccounts.push(newlinkedAccount);
-    return newlinkedAccount;
+  async create(data){
+    const newLinkedAccounts = new LinkedAccountModel(data);
+    await newLinkedAccounts.save(); 
+    return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  findOne(id){
-    const linkedAccount = this.linkedAccounts.find((item) => item.id === id)
-    if(!linkedAccount)
-      throw boom.notFound('La cuenta no fue encontrada');
+  async findOne(id){
+
+    const linkedAccount = await LinkedAccountModel.findOne({
+      _id:id
+    })
+
+    if(linkedAccount == undefined || linkedAccount == null)
+      throw boom.notFound(errNotFound);
+    else if (linkedAccount.length <= 0 )
+      throw boom.notFound(errEmpty);
+
     return linkedAccount;
 
   }
 
   //EDIT SPECIFIC ACCOUNT
-  update(id, changes){
-    const index = this.linkedAccounts.findIndex(item => item.id === id);
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+  async update(id, changes){
+
+    let linkedAccount = await LinkedAccountModel.findOne({
+      _id:id
+    });
     
-    var currentlinkedAccount = this.linkedAccounts[index];
-    this.linkedAccounts[index] =  {
-      ...currentlinkedAccount, 
-      ...changes
+    if(linkedAccount == undefined || linkedAccount == null)
+      throw boom.notFound(errNotFound);
+    if(linkedAccount.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    let originalLinkedAccount = {
+      userID:linkedAccount.userID,
+      email:linkedAccount.email,
+      type:linkedAccount.type
     };
 
+    const {userID, email, type} = changes;
+
+    if(userID)
+      linkedAccount.userID = userID
+    if(email)
+      linkedAccount.email = email
+    if(type)
+      linkedAccount.type = type
+
+    await linkedAccount.save();
+    
     return {
-      old : currentlinkedAccount, 
-      changed: this.linkedAccounts[index]
+      old : originalLinkedAccount, 
+      changed: linkedAccount
     };
   }
 
-  delete(id){
+  async delete(id){
     
-    const index = this.linkedAccounts.findIndex(item => item.id === id)
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+    let linkedAccount = await LinkedAccountModel.findOne({
+      _id:id
+    });
 
-    const currentlinkedAccount = this.linkedAccounts[index];
+    const { deletedCount } = await LinkedAccountModel.deleteOne({
+      _id:id
+    });
 
-    this.linkedAccounts.splice(index, 1);
-    return currentlinkedAccount
+    if(deletedCount <= 0 )
+      throw boom.notFound(errEmpty);
+    
+    return linkedAccount;
   }
    
 }

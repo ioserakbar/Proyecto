@@ -1,8 +1,8 @@
 const Joi = require('joi');
 
-const id = Joi.string().uuid();
-const publicationID = Joi.string().uuid();
-const multimediaID = Joi.string().uuid();
+const id = Joi.string();
+const publicationID = Joi.string();
+const multimediaID = Joi.string();
 
 const createPublicationMultimediaSchema = Joi.object({
   publicationID: publicationID.required(),

@@ -7,12 +7,13 @@ const { createGameSchema, updateGameSchema, getValidGame  } = require('../Schema
 
 
 //GET ALL PRODUCTS
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
 
   try{
 
     const {size} = req.query;
-    const games = service.find(size || 10)
+    const filter = req.body;
+    const games = await service.find(size || 10, filter);
     res.json({
       'success': true,
       'message': 'Estos son los juegos encontrados',
@@ -26,10 +27,10 @@ router.get('/', (req, res, next) => {
 });
  
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createGameSchema, 'body'), (req, res, next) => {  
+router.post('/', validatorHandler(createGameSchema, 'body'), async (req, res, next) => {  
   try {
     const body = req.body;
-    const game = service.create(body);
+    const game = await service.create(body);
 
     res.json({
       'success': true, 
@@ -44,11 +45,11 @@ router.post('/', validatorHandler(createGameSchema, 'body'), (req, res, next) =>
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidGame, 'params'),  (req, res, next) => {
+router.get('/:id', validatorHandler(getValidGame, 'params'),  async (req, res, next) => {
   try{
     const {id} = req.params;
 
-    const game =  service.findOne(id);
+    const game =  await service.findOne(id);
     res.json({
       'success': true,
       'message': 'Este es el juego encontrado',
@@ -62,11 +63,11 @@ router.get('/:id', validatorHandler(getValidGame, 'params'),  (req, res, next) =
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidGame, 'params'), validatorHandler(updateGameSchema, 'body'), (req, res, next) => {
+router.patch('/:id', validatorHandler(getValidGame, 'params'), validatorHandler(updateGameSchema, 'body'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
-    const { old, changed} = service.update(id, data);
+    const { old, changed} = await service.update(id, data);
     res.json({
       'success': true,
       'message': "Se ha actualizado el siguiente juego",
@@ -81,10 +82,10 @@ router.patch('/:id', validatorHandler(getValidGame, 'params'), validatorHandler(
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidGame, 'params'), (req, res, next) => {
+router.delete('/:id', validatorHandler(getValidGame, 'params'), async (req, res, next) => {
   try {
     const { id } = req.params;
-    const game = service.delete(id);
+    const game = await service.delete(id);
     res.json({
       'success': true,
       'message': "Se ha eliminado este juego",

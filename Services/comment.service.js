@@ -1,83 +1,99 @@
-const faker = require('faker');
-
 const boom = require('@hapi/boom');
+
+const CommentModel = require('../Models/comment.model');
+
+const errNotFound = "No se logró encontrar lo buscado";
+const errEmpty = "Aún no hay cuentas creadas";
+
 
 class CommentService{
 
-  constructor(){
-    this.comments = [];
-    this.generate();
-  }
-
-  //GENERATE RANDOM INFO 
-  generate(){
-    const limit = 100;
-    for (let index = 0; index < limit; index++)
-      this.comments.push({
-        id: faker.datatype.uuid(),
-        publicationID: faker.datatype.uuid(),
-        userID: faker.datatype.uuid(),
-        content: faker.lorem.sentence()
-      });   
-  }
-
   //FIND ALL INFO
-  find(size){
-    const comments = this.comments.filter((item, index) => item && index < size);
-    if(!comments)
-      throw boom.notFound("No se encontro el catalogo deseado");
-    else if (comments.length <= 0 )
-      throw boom.notFound("Aún no hay cuentas creadas");
+  async find(limit, filter){
+    
+    let comments = await CommentModel.find(filter);
+    
+    if(comments == undefined || comments == null)
+      throw boom.notFound(errNotFound);
+    if(comments.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    comments = comments.filter((item, index) => item && index < limit);
+    
     return comments;
+
   }
 
   //CREATE INFO
-  create(data){
-    const newComment = {
-      id: faker.datatype.uuid(),
-      ...data //PASA TODOS LOS ELEMENTOS Y LOS COMBINA
-    }
-    this.comments.push(newComment);
-    return newComment;
+  async create(data){
+
+    const newComment = new CommentModel(data);
+    await newComment.save(); 
+    return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  findOne(id){
-    const comment = this.comments.find((item) => item.id === id)
-    if(!comment)
-      throw boom.notFound('La cuenta no fue encontrada');
+  async findOne(id){
+    const comment = await CommentModel.findOne({
+      _id:id
+    })
+
+    if(comment == undefined || comment == null)
+      throw boom.notFound(errNotFound);
+    if(comment.length <= 0 )
+      throw boom.notFound(errEmpty);
+
     return comment;
 
   }
 
   //EDIT SPECIFIC ACCOUNT
-  update(id, changes){
-    const index = this.comments.findIndex(item => item.id === id);
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+  async update(id, changes){
     
-    var currentcomment = this.comments[index];
-    this.comments[index] =  {
-      ...currentcomment, 
-      ...changes
+    let comment = await CommentModel.findOne({
+      _id:id
+    });
+
+    if(comment == undefined || comment == null)
+      throw boom.notFound(errNotFound);
+    if(comment.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    let originalComment = {
+      publicationID:comment.publicationID,
+      userID:comment.userID,
+      content:comment.content,
     };
 
+    const {publicationID, userID, content} = changes;
+
+    if(publicationID)
+      comment.publicationID = publicationID
+    if(userID)
+      comment.userID = userID
+    if(content)
+      comment.content = content
+    await comment.save();
+    
     return {
-      old : currentcomment, 
-      changed: this.comments[index]
+      old : originalComment, 
+      changed: comment
     };
   }
 
-  delete(id){
+  async delete(id){
+    let comment = await CommentModel.findOne({
+      _id:id
+    });
+
+    const { deletedCount } = await CommentModel.deleteOne({
+      _id:id
+    });
+
+    if(deletedCount <= 0 )
+      throw boom.notFound(errEmpty);
     
-    const index = this.comments.findIndex(item => item.id === id)
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
-
-    const currentcomment = this.comments[index];
-
-    this.comments.splice(index, 1);
-    return currentcomment
+    return comment;
   }
    
 }

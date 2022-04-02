@@ -7,16 +7,17 @@ const { createCountrySchema, updateCountrySchema, getValidCountry } = require('.
 
 
 //GET ALL PRODUCTS
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
 
   try{
 
-    const {size} = req.query;
-    const countrys = service.find(size || 10)
+    const { size } = req.query;
+    const filter = req.body;
+    const countries = await service.find(size || 10, filter);
     res.json({
       'success': true,
       'message': 'Estos son los paises encontrados',
-      'Data': countrys
+      'Data': countries
     });
 
   } catch (error){
@@ -26,13 +27,13 @@ router.get('/', (req, res, next) => {
 });
  
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createCountrySchema, 'body'), (req, res, next) => {  
+router.post('/', validatorHandler(createCountrySchema, 'body'), async (req, res, next) => {  
   try {
     const body = req.body;
-    const country = service.create(body);
+    const country =  await service.create(body);
 
     res.json({
-      'success': true, 
+      'success': true,  
       'message': "El pais se ha creado con exito", 
       'Data': country 
    });
@@ -44,11 +45,11 @@ router.post('/', validatorHandler(createCountrySchema, 'body'), (req, res, next)
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidCountry, 'params'),  (req, res, next) => {
+router.get('/:id', validatorHandler(getValidCountry, 'params'),  async (req, res, next) => {
   try{
     const {id} = req.params;
 
-    const country =  service.findOne(id);
+    const country = await service.findOne(id);
     res.json({
       'success': true,
       'message': 'Este es el pais encontrado',
@@ -62,11 +63,11 @@ router.get('/:id', validatorHandler(getValidCountry, 'params'),  (req, res, next
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidCountry, 'params'), validatorHandler(updateCountrySchema, 'body'), (req, res, next) => {
+router.patch('/:id', validatorHandler(getValidCountry, 'params'), validatorHandler(updateCountrySchema, 'body'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
-    const { old, changed} = service.update(id, data);
+    const { old, changed} = await service.update(id, data);
     res.json({
       'success': true,
       'message': "Se ha actualizado el siguiente pais",
@@ -81,10 +82,10 @@ router.patch('/:id', validatorHandler(getValidCountry, 'params'), validatorHandl
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidCountry, 'params'), (req, res, next) => {
+router.delete('/:id', validatorHandler(getValidCountry, 'params'), async (req, res, next) => {
   try {
     const { id } = req.params;
-    const country = service.delete(id);
+    const country =  await service.delete(id);
     res.json({
       'success': true,
       'message': "Se ha eliminado este pais",

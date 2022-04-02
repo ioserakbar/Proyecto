@@ -1,39 +1,23 @@
-const faker = require('faker');
+//const faker = require('faker');
 const boom = require('@hapi/boom');
 const AccountModel = require('../Models/account.model');
 
-const errNotFound = "No se encontro el catalogo deseado";
+const errNotFound = "No se logró encontrar lo buscado";
 const errEmpty = "Aún no hay cuentas creadas";
 
 
 class AccountService{
 
-  constructor(){
-    this.accounts = [];
-    this.generate();
-  }
-
-  //GENERATE RANDOM INFO 
-  generate(){
-    const limit = 100;
-    for (let index = 0; index < limit; index++)
-      this.accounts.push({
-        id: faker.datatype.uuid(),
-        user: faker.internet.userName(),
-        password: faker.internet.password(),
-        email: faker.internet.email(),
-        userID: faker.datatype.uuid()
-      });   
-  }
+  
 
   //FIND ALL INFO
   async find(limit, filter){
     
     let accounts = await AccountModel.find(filter);
     
-    if(!accounts)
+    if(accounts == undefined || accounts == null)
       throw boom.notFound(errNotFound);
-    else if (accounts.length <= 0 )
+    if(accounts.length <= 0 )
       throw boom.notFound(errEmpty);
 
     accounts = accounts.filter((item, index) => item && index < limit);
@@ -44,52 +28,77 @@ class AccountService{
 
   //CREATE INFO
   async create(data){
-    const info = {
-      id: faker.datatype.uuid(),
-      ...data //PASA TODOS LOS ELEMENTOS Y LOS COMBINA
-    }
-    const newAccount = new AccountModel(info);
-    await newAccount.save(); 
 
-    return info;
+    const newAccount = new AccountModel(data);
+    await newAccount.save(); 
+    return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  findOne(id){
-    const account = this.accounts.find((item) => item.id === id)
-    if(!account)
-      throw boom.notFound('La cuenta no fue encontrada');
+  async findOne(id){
+    const account = await AccountModel.findOne({
+      _id:id
+    })
+
+    if(account == undefined || account == null)
+      throw boom.notFound(errNotFound);
+    if(account.length <= 0 )
+      throw boom.notFound(errEmpty);
+
     return account;
 
   }
 
   //EDIT SPECIFIC ACCOUNT
-  update(id, changes){
-    const index = this.accounts.findIndex(item => item.id === id);
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+  async update(id, changes){
     
-    var currentAccount = this.accounts[index];
-    this.accounts[index] =  {
-      ...currentAccount, 
-      ...changes
+    let account = await AccountModel.findOne({
+      _id:id
+    });
+
+    if(account == undefined || account == null)
+      throw boom.notFound(errNotFound);
+    if(account.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    let originalAccount = {
+      user:account.user,
+      password:account.password,
+      email:account.email,
+      userID:account.userID
     };
 
+    const {user, password, email, userID} = changes;
+
+    if(user)
+      account.user = user
+    if(password)
+      account.password = password
+    if(email)
+      account.email = email
+    if(userID)
+      account.userID = userID
+
+    await account.save();
     return {
-      old : currentAccount, 
-      changed: this.accounts[index]
+      old : originalAccount, 
+      changed: account
     };
   }
 
-  delete(id){
-    const index = this.accounts.findIndex(item => item.id === id)
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+  async delete(id){
+    let account = await AccountModel.findOne({
+      _id:id
+    });
 
-    const currentAccount = this.accounts[index];
+    const { deletedCount } = await AccountModel.deleteOne({
+      _id:id
+    });
 
-    this.accounts.splice(index, 1);
-    return currentAccount
+    if(deletedCount <= 0 )
+      throw boom.notFound(errEmpty);
+    
+    return account;
   }
    
 }

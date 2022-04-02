@@ -1,82 +1,98 @@
-const faker = require('faker');
-
+//const faker = require('faker');
 const boom = require('@hapi/boom');
+const ChatRoomModel = require('../Models/chatroom.model');
+
+const errNotFound = "No se logró encontrar lo buscado";
+const errEmpty = "Aún no hay cuentas creadas";
+
 
 class ChatroomService{
 
-  constructor(){
-    this.chatrooms = [];
-    this.generate();
-  }
-
-  //GENERATE RANDOM INFO 
-  generate(){
-    const limit = 100;
-    for (let index = 0; index < limit; index++)
-      this.chatrooms.push({
-        id: faker.datatype.uuid(),
-        userOne: faker.datatype.uuid(),
-        userTwo: faker.datatype.uuid()
-      });   
-  }
+  
 
   //FIND ALL INFO
-  find(size){
-    const chatrooms = this.chatrooms.filter((item, index) => item && index < size);
-    if(!chatrooms)
-      throw boom.notFound("No se encontro el catalogo deseado");
-    else if (chatrooms.length <= 0 )
-      throw boom.notFound("Aún no hay cuentas creadas");
+  async find(limit, filter){
+    
+    let chatrooms = await ChatRoomModel.find(filter);
+    
+    if(chatrooms == undefined || chatrooms == null)
+      throw boom.notFound(errNotFound);
+    if(chatrooms.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    chatrooms = chatrooms.filter((item, index) => item && index < limit);
+    
     return chatrooms;
+
   }
 
   //CREATE INFO
-  create(data){
-    const newChatroom = {
-      id: faker.datatype.uuid(),
-      ...data //PASA TODOS LOS ELEMENTOS Y LOS COMBINA
-    }
-    this.chatrooms.push(newChatroom);
-    return newChatroom;
+  async create(data){
+
+    const newChatRoom = new ChatRoomModel(data);
+    await newChatRoom.save(); 
+    return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  findOne(id){
-    const chatroom = this.chatrooms.find((item) => item.id === id)
-    if(!chatroom)
-      throw boom.notFound('La cuenta no fue encontrada');
+  async findOne(id){
+    const chatroom = await ChatRoomModel.findOne({
+      _id:id
+    })
+
+    if(chatroom == undefined || chatroom == null)
+      throw boom.notFound(errNotFound);
+    if(chatroom.length <= 0 )
+      throw boom.notFound(errEmpty);
+
     return chatroom;
 
   }
 
   //EDIT SPECIFIC ACCOUNT
-  update(id, changes){
-    const index = this.chatrooms.findIndex(item => item.id === id);
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+  async update(id, changes){
     
-    var currentChatroom = this.chatrooms[index];
-    this.chatrooms[index] =  {
-      ...currentChatroom, 
-      ...changes
+    let chatroom = await ChatRoomModel.findOne({
+      _id:id
+    });
+
+    if(chatroom == undefined || chatroom == null)
+      throw boom.notFound(errNotFound);
+    if(chatroom.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    let originalChatrrom = {
+      userOne:chatroom.userOne,
+      userTwo:chatroom.userTwo,
     };
 
+    const {userOne, userTwo} = changes;
+
+    if(userOne)
+      chatroom.userOne = userOne
+    if(userTwo)
+      chatroom.userTwo = userTwo
+
+    await chatroom.save();
     return {
-      old : currentChatroom, 
-      changed: this.chatrooms[index]
+      old : originalChatrrom, 
+      changed: chatroom
     };
   }
 
-  delete(id){
+  async delete(id){
+    let chatroom = await ChatRoomModel.findOne({
+      _id:id
+    });
+
+    const { deletedCount } = await ChatRoomModel.deleteOne({
+      _id:id
+    });
+
+    if(deletedCount <= 0 )
+      throw boom.notFound(errEmpty);
     
-    const index = this.chatrooms.findIndex(item => item.id === id)
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
-
-    const currentChatroom = this.chatrooms[index];
-
-    this.chatrooms.splice(index, 1);
-    return currentChatroom
+    return chatroom;
   }
    
 }

@@ -1,11 +1,11 @@
 const Joi = require('joi');
 
-const id = Joi.string().uuid();
+const id = Joi.string();
 const date = Joi.date();
-const gameID = Joi.string().uuid();
-const userID = Joi.string().uuid();
+const gameID = Joi.string();
+const userID = Joi.string();
 const content = Joi.string().max(250);
-const multimediaID = Joi.string().uuid();
+const multimediaID = Joi.string();
 
 const createVideoplaySchema = Joi.object({
   date:date.required(),

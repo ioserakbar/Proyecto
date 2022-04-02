@@ -7,12 +7,13 @@ const { createChatroomSchema, updateChatroomSchema, getValidChatroom } = require
 
 
 //GET ALL PRODUCTS
-router.get('/', (req, res, next) => {
+router.get('/', async(req, res, next) => {
 
   try{
 
     const {size} = req.query;
-    const chatrooms = service.find(size || 10)
+    const filter = req.body;
+    const chatrooms = await service.find(size || 10, filter);
     res.json({
       'success': true,
       'message': 'Estos son los chat rooms encontrados',
@@ -26,10 +27,10 @@ router.get('/', (req, res, next) => {
 });
  
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createChatroomSchema, 'body'), (req, res, next) => {  
+router.post('/', validatorHandler(createChatroomSchema, 'body'), async(req, res, next) => {  
   try {
     const body = req.body;
-    const chatroom = service.create(body);
+    const chatroom = await service.create(body);
 
     res.json({
       'success': true, 
@@ -44,11 +45,11 @@ router.post('/', validatorHandler(createChatroomSchema, 'body'), (req, res, next
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidChatroom, 'params'),  (req, res, next) => {
+router.get('/:id', validatorHandler(getValidChatroom, 'params'),  async(req, res, next) => {
   try{
     const {id} = req.params;
 
-    const chatroom =  service.findOne(id);
+    const chatroom =  await service.findOne(id);
     res.json({
       'success': true,
       'message': 'Este es el chat room encontrado',
@@ -62,11 +63,11 @@ router.get('/:id', validatorHandler(getValidChatroom, 'params'),  (req, res, nex
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidChatroom, 'params'), validatorHandler(updateChatroomSchema, 'body'), (req, res, next) => {
+router.patch('/:id', validatorHandler(getValidChatroom, 'params'), validatorHandler(updateChatroomSchema, 'body'), async(req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
-    const { old, changed} = service.update(id, data);
+    const { old, changed} = await service.update(id, data);
     res.json({
       'success': true,
       'message': "Se ha actualizado el siguiente chat room",
@@ -81,10 +82,10 @@ router.patch('/:id', validatorHandler(getValidChatroom, 'params'), validatorHand
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidChatroom, 'params'), (req, res, next) => {
+router.delete('/:id', validatorHandler(getValidChatroom, 'params'), async(req, res, next) => {
   try {
     const { id } = req.params;
-    const chatroom = service.delete(id);
+    const chatroom = await service.delete(id);
     res.json({
       'success': true,
       'message': "Se ha eliminado este chat room",

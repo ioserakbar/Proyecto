@@ -7,12 +7,13 @@ const { createMultimediaSchema, updateMultimediaSchema, getValidMultimedia} = re
 
 
 //GET ALL PRODUCTS
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
 
   try{
 
     const {size} = req.query;
-    const multimedias = service.find(size || 10)
+    const filter = req.body;
+    const multimedias = await service.find(size || 10, filter);
     res.json({
       'success': true,
       'message': 'Esta es la multimedia en los comentarios encontrados',
@@ -26,10 +27,10 @@ router.get('/', (req, res, next) => {
 });
  
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createMultimediaSchema, 'body'), (req, res, next) => {  
+router.post('/', validatorHandler(createMultimediaSchema, 'body'), async (req, res, next) => {  
   try {
     const body = req.body;
-    const multimedia = service.create(body);
+    const multimedia = await service.create(body);
 
     res.json({
       'success': true, 
@@ -44,11 +45,11 @@ router.post('/', validatorHandler(createMultimediaSchema, 'body'), (req, res, ne
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidMultimedia, 'params'),  (req, res, next) => {
+router.get('/:id', validatorHandler(getValidMultimedia, 'params'),  async (req, res, next) => {
   try{
     const {id} = req.params;
 
-    const multimedia =  service.findOne(id);
+    const multimedia =  await service.findOne(id);
     res.json({
       'success': true,
       'message': 'Esta es la multimedia encontrado',
@@ -62,11 +63,11 @@ router.get('/:id', validatorHandler(getValidMultimedia, 'params'),  (req, res, n
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidMultimedia, 'params'), validatorHandler(updateMultimediaSchema, 'body'), (req, res, next) => {
+router.patch('/:id', validatorHandler(getValidMultimedia, 'params'), validatorHandler(updateMultimediaSchema, 'body'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
-    const { old, changed} = service.update(id, data);
+    const { old, changed} = await service.update(id, data);
     res.json({
       'success': true,
       'message': "Se ha actualizado la siguiente multimedia",
@@ -81,10 +82,10 @@ router.patch('/:id', validatorHandler(getValidMultimedia, 'params'), validatorHa
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidMultimedia, 'params'), (req, res, next) => {
+router.delete('/:id', validatorHandler(getValidMultimedia, 'params'), async (req, res, next) => {
   try {
     const { id } = req.params;
-    const multimedia = service.delete(id);
+    const multimedia = await service.delete(id);
     res.json({
       'success': true,
       'message': "Se ha eliminado esta multimedia",

@@ -1,86 +1,103 @@
-const faker = require('faker');
+const RankingModel = require("../Models/ranking.model")
+const errNotFound = "No se logró encontrar lo buscado";
+const errEmpty = "Aún no hay cuentas creadas";
 
 const boom = require('@hapi/boom');
 
 class RankingService{
 
-  constructor(){
-    this.rankings = [];
-    this.generate();
-  }
-
-  //GENERATE RANDOM INFO 
-  generate(){
-    const limit = 100;
-    for (let index = 0; index < limit; index++)
-      this.rankings.push({
-        id: faker.datatype.uuid(),
-        gameID: faker.datatype.uuid(),
-        name: faker.name.findName(),
-        image: faker.image.image(),
-        index: faker.random.number()
-      });   
-  }
-
   //FIND ALL INFO
-  find(size){
-    const rankings = this.rankings.filter((item, index) => item && index < size);
-    if(!rankings)
-      throw boom.notFound("No se encontro el catalogo deseado");
+  async find(limit, filter){
+
+    let rankings = await RankingModel.find(filter);
+    
+    if(rankings == undefined || rankings == null)
+      throw boom.notFound(errNotFound);
     else if (rankings.length <= 0 )
-      throw boom.notFound("Aún no hay cuentas creadas");
+      throw boom.notFound(errEmpty);
+
+    rankings = rankings.filter((item, index) => item && index < limit);
     return rankings;
+
   }
 
   //CREATE INFO
-  create(data){
-    const newranking = {
-      id: faker.datatype.uuid(),
-      ...data //PASA TODOS LOS ELEMENTOS Y LOS COMBINA
-    }
-    this.rankings.push(newranking);
-    return newranking;
+  async create(data){
+    const newRanking = new RankingModel(data);
+    await newRanking.save(); 
+    return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  findOne(id){
-    const ranking = this.rankings.find((item) => item.id === id)
-    if(!ranking)
-      throw boom.notFound('La cuenta no fue encontrada');
+  async findOne(id){
+
+    const ranking = await RankingModel.findOne({
+      _id:id
+    })
+
+    if(ranking == undefined || ranking == null)
+      throw boom.notFound(errNotFound);
+    else if (ranking.length <= 0 )
+      throw boom.notFound(errEmpty);
+
     return ranking;
 
   }
 
   //EDIT SPECIFIC ACCOUNT
-  update(id, changes){
-    const index = this.rankings.findIndex(item => item.id === id);
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+  async update(id, changes){
+
+    let ranking = await RankingModel.findOne({
+      _id:id
+    });
     
-    var currentranking = this.rankings[index];
-    this.rankings[index] =  {
-      ...currentranking, 
-      ...changes
+    if(ranking == undefined || ranking == null)
+      throw boom.notFound(errNotFound);
+    if(ranking.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    let originalRanking = {
+      gameID:ranking.gameID,
+      name:ranking.name,
+      image:ranking.image,
+      index:ranking.index,
     };
 
+    const {gameID, name, image, index} = changes;
+
+    if(gameID)
+      ranking.gameID = gameID
+    if(name)
+      ranking.name = name
+    if(image)
+      ranking.image = image
+    if(index)
+      ranking.index = index
+
+    await ranking.save();
+    
     return {
-      old : currentranking, 
-      changed: this.rankings[index]
+      old : originalRanking, 
+      changed: ranking
     };
   }
 
-  delete(id){
+  async delete(id){
     
-    const index = this.rankings.findIndex(item => item.id === id)
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+    let ranking = await RankingModel.findOne({
+      _id:id
+    });
 
-    const currentranking = this.rankings[index];
+    const { deletedCount } = await RankingModel.deleteOne({
+      _id:id
+    });
 
-    this.rankings.splice(index, 1);
-    return currentranking
+    if(deletedCount <= 0 )
+      throw boom.notFound(errEmpty);
+    
+    return ranking;
   }
-   
+ 
 }
 
 module.exports = RankingService;

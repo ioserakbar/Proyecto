@@ -1,13 +1,13 @@
 const Joi = require('joi');
 
 
-const id = Joi.string().uuid();
+const id = Joi.string();
 const name = Joi.string().min(2).max(40);
 const age = Joi.number().integer().min(13);
 const gender = Joi.string().alphanum();
 const voicechat = Joi.boolean();
-const country = Joi.string().uuid();
-const schedule = Joi.string().uuid();
+const country = Joi.string();
+const schedule = Joi.string();
 const description = Joi.string().max(250);
 const profile = Joi.string().max(100);
 const profilePic = Joi.string();

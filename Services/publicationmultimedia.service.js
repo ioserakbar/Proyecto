@@ -1,83 +1,97 @@
-const faker = require('faker');
+const PublicationMultimediaModel = require("../Models/publicationMultimedia.model")
+const errNotFound = "No se logró encontrar lo buscado";
+const errEmpty = "Aún no hay cuentas creadas";
 
 const boom = require('@hapi/boom');
 
 class PublicationMultimediaService{
 
-  constructor(){
-    this.publicationMultimedias = [];
-    this.generate();
-  }
-
-  //GENERATE RANDOM INFO 
-  generate(){
-    const limit = 100;
-    for (let index = 0; index < limit; index++)
-      this.publicationMultimedias.push({
-        id: faker.datatype.uuid(),
-        publicationID: faker.datatype.uuid(),
-        multimediaID: faker.datatype.uuid()
-      });   
-  }
-
   //FIND ALL INFO
-  find(size){
-    const publicationMultimedias = this.publicationMultimedias.filter((item, index) => item && index < size);
-    if(!publicationMultimedias)
-      throw boom.notFound("No se encontro el catalogo deseado");
-    else if (publicationMultimedias.length <= 0 )
-      throw boom.notFound("Aún no hay cuentas creadas");
-    return publicationMultimedias;
+  async find(limit, filter){
+
+    let multimediaPublications = await PublicationMultimediaModel.find(filter);
+    
+    if(multimediaPublications == undefined || multimediaPublications == null)
+      throw boom.notFound(errNotFound);
+    else if (multimediaPublications.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    multimediaPublications = multimediaPublications.filter((item, index) => item && index < limit);
+    return multimediaPublications;
+
   }
 
   //CREATE INFO
-  create(data){
-    const newpublicationMultimedia = {
-      id: faker.datatype.uuid(),
-      ...data //PASA TODOS LOS ELEMENTOS Y LOS COMBINA
-    }
-    this.publicationMultimedias.push(newpublicationMultimedia);
-    return newpublicationMultimedia;
+  async create(data){
+    const newPublicationMultimedia = new PublicationMultimediaModel(data);
+    await newPublicationMultimedia.save(); 
+    return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  findOne(id){
-    const publicationMultimedia = this.publicationMultimedias.find((item) => item.id === id)
-    if(!publicationMultimedia)
-      throw boom.notFound('La cuenta no fue encontrada');
+  async findOne(id){
+
+    const publicationMultimedia = await PublicationMultimediaModel.findOne({
+      _id:id
+    })
+
+    if(publicationMultimedia == undefined || publicationMultimedia == null)
+      throw boom.notFound(errNotFound);
+    else if (publicationMultimedia.length <= 0 )
+      throw boom.notFound(errEmpty);
+
     return publicationMultimedia;
 
   }
 
   //EDIT SPECIFIC ACCOUNT
-  update(id, changes){
-    const index = this.publicationMultimedias.findIndex(item => item.id === id);
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+  async update(id, changes){
+
+    let publicationMultimedia = await PublicationMultimediaModel.findOne({
+      _id:id
+    });
     
-    var currentpublicationMultimedia = this.publicationMultimedias[index];
-    this.publicationMultimedias[index] =  {
-      ...currentpublicationMultimedia, 
-      ...changes
+    if(publicationMultimedia == undefined || publicationMultimedia == null)
+      throw boom.notFound(errNotFound);
+    if(publicationMultimedia.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    let originalNotRecommended = {
+      multimediaID:publicationMultimedia.multimediaID,
+      publication:publicationMultimedia.publication
     };
 
+    const {multimediaID, publication} = changes;
+
+    if(multimediaID)
+      publicationMultimedia.multimediaID = multimediaID
+    if(publication)
+      publicationMultimedia.publication = publication
+
+    await publicationMultimedia.save();
+    
     return {
-      old : currentpublicationMultimedia, 
-      changed: this.publicationMultimedias[index]
+      old : originalNotRecommended, 
+      changed: publicationMultimedia
     };
   }
 
-  delete(id){
+  async delete(id){
     
-    const index = this.publicationMultimedias.findIndex(item => item.id === id)
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+    let publicationMultimedia = await PublicationMultimediaModel.findOne({
+      _id:id
+    });
 
-    const currentpublicationMultimedia = this.publicationMultimedias[index];
+    const { deletedCount } = await PublicationMultimediaModel.deleteOne({
+      _id:id
+    });
 
-    this.publicationMultimedias.splice(index, 1);
-    return currentpublicationMultimedia
+    if(deletedCount <= 0 )
+      throw boom.notFound(errEmpty);
+    
+    return publicationMultimedia;
   }
+   
    
 }
 

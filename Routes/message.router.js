@@ -7,12 +7,13 @@ const { createMessageSchema, updateMessageSchema, getValidMessage } = require('.
 
 
 //GET ALL PRODUCTS
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
 
   try{
 
     const {size} = req.query;
-    const messages = service.find(size || 10)
+    const filter = req.body;
+    const messages = await service.find(size || 10, filter);
     res.json({
       'success': true,
       'message': 'Estos son los mensajes encontrados',
@@ -26,10 +27,10 @@ router.get('/', (req, res, next) => {
 });
  
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createMessageSchema, 'body'), (req, res, next) => {  
+router.post('/', validatorHandler(createMessageSchema, 'body'), async (req, res, next) => {  
   try {
     const body = req.body;
-    const message = service.create(body);
+    const message = await service.create(body);
 
     res.json({
       'success': true, 
@@ -44,11 +45,11 @@ router.post('/', validatorHandler(createMessageSchema, 'body'), (req, res, next)
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidMessage, 'params'),  (req, res, next) => {
+router.get('/:id', validatorHandler(getValidMessage, 'params'),  async (req, res, next) => {
   try{
     const {id} = req.params;
 
-    const message =  service.findOne(id);
+    const message =  await service.findOne(id);
     res.json({
       'success': true,
       'message': 'Este es el mensaje encontrado',
@@ -62,11 +63,11 @@ router.get('/:id', validatorHandler(getValidMessage, 'params'),  (req, res, next
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidMessage, 'params'), validatorHandler(updateMessageSchema, 'body'), (req, res, next) => {
+router.patch('/:id', validatorHandler(getValidMessage, 'params'), validatorHandler(updateMessageSchema, 'body'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
-    const { old, changed} = service.update(id, data);
+    const { old, changed} = await service.update(id, data);
     res.json({
       'success': true,
       'message': "Se ha actualizado el siguiente mensaje",
@@ -81,10 +82,10 @@ router.patch('/:id', validatorHandler(getValidMessage, 'params'), validatorHandl
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidMessage, 'params'), (req, res, next) => {
+router.delete('/:id', validatorHandler(getValidMessage, 'params'), async (req, res, next) => {
   try {
     const { id } = req.params;
-    const message = service.delete(id);
+    const message = await service.delete(id);
     res.json({
       'success': true,
       'message': "Se ha eliminado este mensaje",

@@ -1,8 +1,8 @@
 const Joi = require('joi');
 
-const id = Joi.string().uuid();
-const userOne = Joi.string().uuid();
-const userTwo = Joi.string().uuid();
+const id = Joi.string();
+const userOne = Joi.string();
+const userTwo = Joi.string();
 
 const createChatroomSchema = Joi.object({
   userOne: userOne.required(),

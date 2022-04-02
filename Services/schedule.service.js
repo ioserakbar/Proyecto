@@ -1,88 +1,112 @@
-const faker = require('faker');
+const ScheduleModel = require("../Models/schedule.model")
+const errNotFound = "No se logró encontrar lo buscado";
+const errEmpty = "Aún no hay cuentas creadas";
 
 const boom = require('@hapi/boom');
 
 class ScheduleService{
 
-  constructor(){
-    this.schedules = [];
-    this.generate();
-  }
-
-  //GENERATE RANDOM INFO 
-  generate(){
-    const limit = 100;
-    for (let index = 0; index < limit; index++)
-      this.schedules.push({
-        id: faker.datatype.uuid(),
-        lunes: faker.lorem.sentence(),
-        martes: faker.lorem.sentence(),
-        miercoles: faker.lorem.sentence(),
-        jueves: faker.lorem.sentence(),
-        viernes: faker.lorem.sentence(),
-        sabado: faker.lorem.sentence(),
-        domingo: faker.lorem.sentence()
-      });   
-  }
-
   //FIND ALL INFO
-  find(size){
-    const schedules = this.schedules.filter((item, index) => item && index < size);
-    if(!schedules)
-      throw boom.notFound("No se encontro el catalogo deseado");
+  async find(limit, filter){
+
+    let schedules = await ScheduleModel.find(filter);
+    
+    if(schedules == undefined || schedules == null)
+      throw boom.notFound(errNotFound);
     else if (schedules.length <= 0 )
-      throw boom.notFound("Aún no hay cuentas creadas");
+      throw boom.notFound(errEmpty);
+
+    schedules = schedules.filter((item, index) => item && index < limit);
     return schedules;
+
   }
 
   //CREATE INFO
-  create(data){
-    const newschedule = {
-      id: faker.datatype.uuid(),
-      ...data //PASA TODOS LOS ELEMENTOS Y LOS COMBINA
-    }
-    this.schedules.push(newschedule);
-    return newschedule;
+  async create(data){
+    const newSchedule = new ScheduleModel(data);
+    await newSchedule.save(); 
+    return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  findOne(id){
-    const schedule = this.schedules.find((item) => item.id === id)
-    if(!schedule)
-      throw boom.notFound('La cuenta no fue encontrada');
+  async findOne(id){
+
+    const schedule = await ScheduleModel.findOne({
+      _id:id
+    })
+
+    if(schedule == undefined || schedule == null)
+      throw boom.notFound(errNotFound);
+    else if (schedule.length <= 0 )
+      throw boom.notFound(errEmpty);
+
     return schedule;
 
   }
 
   //EDIT SPECIFIC ACCOUNT
-  update(id, changes){
-    const index = this.schedules.findIndex(item => item.id === id);
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+  async update(id, changes){
+
+    let schedule = await ScheduleModel.findOne({
+      _id:id
+    });
     
-    var currentschedule = this.schedules[index];
-    this.schedules[index] =  {
-      ...currentschedule, 
-      ...changes
+    if(schedule == undefined || schedule == null)
+      throw boom.notFound(errNotFound);
+    if(schedule.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    let originalSchedule = {
+      lunes:schedule.lunes,
+      martes:schedule.martes,
+      miercoles:schedule.miercoles,
+      jueves:schedule.userID,
+      viernes:schedule.userID,
+      sabado:schedule.sabado,
+      domingo:schedule.domingo
     };
 
+    const {lunes, martes, miercoles, jueves, viernes, sabado, domingo} = changes;
+
+    if(lunes)
+      schedule.lunes = lunes
+    if(martes)
+      schedule.martes = martes
+    if(miercoles)
+      schedule.miercoles = miercoles
+    if(jueves)
+      schedule.jueves = jueves
+    if(viernes)
+      schedule.viernes = viernes
+    if(sabado)
+      schedule.sabado = sabado
+    if(domingo)
+      schedule.domingo = domingo
+
+    await schedule.save();
+    
     return {
-      old : currentschedule, 
-      changed: this.schedules[index]
+      old : originalSchedule, 
+      changed: schedule
     };
   }
 
-  delete(id){
+  async delete(id){
     
-    const index = this.schedules.findIndex(item => item.id === id)
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+    let schedule = await ScheduleModel.findOne({
+      _id:id
+    });
 
-    const currentschedule = this.schedules[index];
+    const { deletedCount } = await ScheduleModel.deleteOne({
+      _id:id
+    });
 
-    this.schedules.splice(index, 1);
-    return currentschedule
+    if(deletedCount <= 0 )
+      throw boom.notFound(errEmpty);
+    
+    return schedule;
   }
+   
    
 }
 

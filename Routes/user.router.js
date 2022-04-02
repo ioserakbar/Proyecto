@@ -7,12 +7,14 @@ const { createUserSchema, updateUserSchema, getValidUser } = require('../Schemas
 
 
 //GET ALL PRODUCTS
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
 
   try{
 
     const {size} = req.query;
-    const users = service.find(size || 10)
+    const filter = req.body;
+
+    const users = await service.find(size || 10, filter)
     res.json({
       'success': true,
       'message': 'Estos son los usuarios encontrados',
@@ -26,10 +28,10 @@ router.get('/', (req, res, next) => {
 });
  
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createUserSchema, 'body'), (req, res, next) => {  
+router.post('/', validatorHandler(createUserSchema, 'body'), async (req, res, next) => {  
   try {
     const body = req.body;
-    const user = service.create(body);
+    const user = await service.create(body);
 
     res.json({
       'success': true, 
@@ -44,11 +46,13 @@ router.post('/', validatorHandler(createUserSchema, 'body'), (req, res, next) =>
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidUser, 'params'),  (req, res, next) => {
-  try{
-    const {id} = req.params;
+router.get('/:id', validatorHandler(getValidUser, 'params'),  async (req, res, next) => {
 
-    const user =  service.findOne(id);
+  try{
+
+    const {id} = req.params;
+    const user =  await service.findOne(id);
+
     res.json({
       'success': true,
       'message': 'Este es el usuario encontrado',
@@ -57,34 +61,39 @@ router.get('/:id', validatorHandler(getValidUser, 'params'),  (req, res, next) =
   } catch (error){
     next(error);
   }
+
 });
 
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidUser, 'params'), validatorHandler(updateUserSchema, 'body'), (req, res, next) => {
+router.patch('/:id', validatorHandler(getValidUser, 'params'), validatorHandler(updateUserSchema, 'body'), async (req, res, next) => {
+
   try {
     const { id } = req.params;
     const data = req.body;
-    const { old, changed} = service.update(id, data);
+    const { old, changed} = await service.update(id, data);
     res.json({
+      
       'success': true,
       'message': "Se ha actualizado el siguiente usuario",
       'Data': {
         "Original": old,
         "Modificado": changed
       }
+
     });
   } catch (error) {
     next(error);
   }
+
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidUser, 'params'), (req, res, next) => {
+router.delete('/:id', validatorHandler(getValidUser, 'params'), async (req, res, next) => {
   try {
     const { id } = req.params;
-    const user = service.delete(id);
+    const user = await service.delete(id);
     res.json({
       'success': true,
       'message': "Se ha eliminado este usuario",

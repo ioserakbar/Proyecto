@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-const id = Joi.string().uuid();
+const id = Joi.string();
 const path = Joi.string();
 const extention = Joi.string().min(3).max(5);
 

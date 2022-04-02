@@ -1,83 +1,98 @@
-const faker = require('faker');
-
+const GameModel = require("../Models/game.model")
 const boom = require('@hapi/boom');
 
+const errNotFound = "No se logró encontrar lo buscado";
+const errEmpty = "Aún no hay cuentas creadas";
 class GameService{
 
-  constructor(){
-    this.Games = [];
-    this.generate();
-  }
-
-  //GENERATE RANDOM INFO 
-  generate(){
-    const limit = 100;
-    for (let index = 0; index < limit; index++)
-      this.Games.push({
-        id: faker.datatype.uuid(),
-        name: faker.name.findName(),
-        developers: faker.name.findName(),
-        image: faker.image.image()
-      });   
-  }
-
   //FIND ALL INFO
-  find(size){
-    const Games = this.Games.filter((item, index) => item && index < size);
-    if(!Games)
-      throw boom.notFound("No se encontro el catalogo deseado");
-    else if (Games.length <= 0 )
-      throw boom.notFound("Aún no hay cuentas creadas");
-    return Games;
+  async find(limit, filter){
+
+    let games = await GameModel.find(filter);
+    
+
+    if(games == undefined || games == null)
+      throw boom.notFound(errNotFound);
+    else if (games.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    games = games.filter((item, index) => item && index < limit);
+    return games;
+
   }
 
   //CREATE INFO
-  create(data){
-    const newGame = {
-      id: faker.datatype.uuid(),
-      ...data //PASA TODOS LOS ELEMENTOS Y LOS COMBINA
-    }
-    this.Games.push(newGame);
-    return newGame;
+  async create(data){
+    const newGame = new GameModel(data);
+    await newGame.save(); 
+    return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  findOne(id){
-    const game = this.Games.find((item) => item.id === id)
-    if(!game)
-      throw boom.notFound('La cuenta no fue encontrada');
+  async findOne(id){
+
+    const game = await GameModel.findOne({
+      _id:id
+    })
+
+    if(game == undefined || game == null)
+      throw boom.notFound(errNotFound);
+    else if (game.length <= 0 )
+      throw boom.notFound(errEmpty);
+
     return game;
 
   }
 
   //EDIT SPECIFIC ACCOUNT
-  update(id, changes){
-    const index = this.Games.findIndex(item => item.id === id);
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+  async update(id, changes){
+
+    let game = await GameModel.findOne({
+      _id:id
+    });
     
-    var currentGame = this.Games[index];
-    this.Games[index] =  {
-      ...currentGame, 
-      ...changes
+    if(game == undefined || game == null)
+      throw boom.notFound(errNotFound);
+    if(game.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    let originalGame = {
+      name:game.name,
+      developers:game.developers,
+      image:game.image
     };
 
+    const {name, developers, image} = changes;
+
+    if(name)
+      game.name = name
+    if(developers)
+      game.developers = developers
+    if(image)
+      game.image = image
+
+    await game.save();
+    
     return {
-      old : currentGame, 
-      changed: this.Games[index]
+      old : originalGame, 
+      changed: game
     };
   }
 
-  delete(id){
+  async delete(id){
     
-    const index = this.Games.findIndex(item => item.id === id)
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+    let game = await GameModel.findOne({
+      _id:id
+    });
 
-    const currentGame = this.Games[index];
+    const { deletedCount } = await GameModel.deleteOne({
+      _id:id
+    });
 
-    this.Games.splice(index, 1);
-    return currentGame
+    if(deletedCount <= 0 )
+      throw boom.notFound(errEmpty);
+    
+    return game;
   }
    
 }

@@ -7,12 +7,13 @@ const { createVideoplaySchema, updateVideoplaySchema, getValidVideoplay } = requ
 
 
 //GET ALL PRODUCTS
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
 
   try{
 
     const {size} = req.query;
-    const videoplays = service.find(size || 10)
+    const filter = req.body;
+    const videoplays = await service.find(size || 10, filter)
     res.json({
       'success': true,
       'message': 'Estas son las plays encontrados',
@@ -26,10 +27,10 @@ router.get('/', (req, res, next) => {
 });
  
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createVideoplaySchema, 'body'), (req, res, next) => {  
+router.post('/', validatorHandler(createVideoplaySchema, 'body'), async (req, res, next) => {  
   try {
     const body = req.body;
-    const videoplay = service.create(body);
+    const videoplay = await service.create(body);
 
     res.json({
       'success': true, 
@@ -44,11 +45,11 @@ router.post('/', validatorHandler(createVideoplaySchema, 'body'), (req, res, nex
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidVideoplay, 'params'),  (req, res, next) => {
+router.get('/:id', validatorHandler(getValidVideoplay, 'params'),  async (req, res, next) => {
   try{
     const {id} = req.params;
 
-    const videoplay =  service.findOne(id);
+    const videoplay =  await service.findOne(id);
     res.json({
       'success': true,
       'message': 'Esta es la play encontrado',
@@ -62,11 +63,11 @@ router.get('/:id', validatorHandler(getValidVideoplay, 'params'),  (req, res, ne
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidVideoplay, 'params'), validatorHandler(updateVideoplaySchema, 'body'), (req, res, next) => {
+router.patch('/:id', validatorHandler(getValidVideoplay, 'params'), validatorHandler(updateVideoplaySchema, 'body'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
-    const { old, changed} = service.update(id, data);
+    const { old, changed} = await service.update(id, data);
     res.json({
       'success': true,
       'message': "Se ha actualizado la siguiente play",
@@ -81,10 +82,10 @@ router.patch('/:id', validatorHandler(getValidVideoplay, 'params'), validatorHan
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidVideoplay, 'params'), (req, res, next) => {
+router.delete('/:id', validatorHandler(getValidVideoplay, 'params'), async (req, res, next) => {
   try {
     const { id } = req.params;
-    const videoplay = service.delete(id);
+    const videoplay = await service.delete(id);
     res.json({
       'success': true,
       'message': "Se ha eliminado esta play",

@@ -1,82 +1,95 @@
-const faker = require('faker');
+const RecommendedModel = require("../Models/recommended.model")
+const errNotFound = "No se logró encontrar lo buscado";
+const errEmpty = "Aún no hay cuentas creadas";
 
 const boom = require('@hapi/boom');
 
 class RecommendedService{
 
-  constructor(){
-    this.recommendeds = [];
-    this.generate();
-  }
-
-  //GENERATE RANDOM INFO 
-  generate(){
-    const limit = 100;
-    for (let index = 0; index < limit; index++)
-      this.recommendeds.push({
-        id: faker.datatype.uuid(),
-        recommendedUser: faker.datatype.uuid(),
-        userID: faker.datatype.uuid()
-      });   
-  }
-
   //FIND ALL INFO
-  find(size){
-    const recommendeds = this.recommendeds.filter((item, index) => item && index < size);
-    if(!recommendeds)
-      throw boom.notFound("No se encontro el catalogo deseado");
+  async find(limit, filter){
+
+    let recommendeds = await RecommendedModel.find(filter);
+    
+    if(recommendeds == undefined || recommendeds == null)
+      throw boom.notFound(errNotFound);
     else if (recommendeds.length <= 0 )
-      throw boom.notFound("Aún no hay cuentas creadas");
+      throw boom.notFound(errEmpty);
+
+    recommendeds = recommendeds.filter((item, index) => item && index < limit);
     return recommendeds;
+
   }
 
   //CREATE INFO
-  create(data){
-    const newrecommended = {
-      id: faker.datatype.uuid(),
-      ...data //PASA TODOS LOS ELEMENTOS Y LOS COMBINA
-    }
-    this.recommendeds.push(newrecommended);
-    return newrecommended;
+  async create(data){
+    const newRecommended = new RecommendedModel(data);
+    await newRecommended.save(); 
+    return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  findOne(id){
-    const recommended = this.recommendeds.find((item) => item.id === id)
-    if(!recommended)
-      throw boom.notFound('La cuenta no fue encontrada');
+  async findOne(id){
+
+    const recommended = await RecommendedModel.findOne({
+      _id:id
+    })
+
+    if(recommended == undefined || recommended == null)
+      throw boom.notFound(errNotFound);
+    else if (recommended.length <= 0 )
+      throw boom.notFound(errEmpty);
+
     return recommended;
 
   }
 
   //EDIT SPECIFIC ACCOUNT
-  update(id, changes){
-    const index = this.recommendeds.findIndex(item => item.id === id);
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+  async update(id, changes){
+
+    let recommended = await RecommendedModel.findOne({
+      _id:id
+    });
     
-    var currentrecommended = this.recommendeds[index];
-    this.recommendeds[index] =  {
-      ...currentrecommended, 
-      ...changes
+    if(recommended == undefined || recommended == null)
+      throw boom.notFound(errNotFound);
+    if(recommended.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    let originalRecommended = {
+      recommendedUser:recommended.recommendedUser,
+      userID:recommended.userID
     };
 
+    const {recommendedUser, userID} = changes;
+
+    if(recommendedUser)
+      recommended.recommendedUser = recommendedUser
+    if(userID)
+      recommended.userID = userID
+
+    await recommended.save();
+    
     return {
-      old : currentrecommended, 
-      changed: this.recommendeds[index]
+      old : originalRecommended, 
+      changed: recommended
     };
   }
 
-  delete(id){
+  async delete(id){
     
-    const index = this.recommendeds.findIndex(item => item.id === id)
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+    let recommended = await RecommendedModel.findOne({
+      _id:id
+    });
 
-    const currentrecommended = this.recommendeds[index];
+    const { deletedCount } = await RecommendedModel.deleteOne({
+      _id:id
+    });
 
-    this.recommendeds.splice(index, 1);
-    return currentrecommended
+    if(deletedCount <= 0 )
+      throw boom.notFound(errEmpty);
+    
+    return recommended;
   }
    
 }

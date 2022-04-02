@@ -7,12 +7,13 @@ const { createScheduleSchema, updateSheduleSchema, getValidShedule } = require('
 
 
 //GET ALL PRODUCTS
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
 
   try{
 
     const {size} = req.query;
-    const schedules = service.find(size || 10)
+    const filter = req.body;
+    const schedules = await service.find(size || 10, filter);
     res.json({
       'success': true,
       'message': 'Estos son los horarios encontrados',
@@ -26,10 +27,10 @@ router.get('/', (req, res, next) => {
 });
  
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createScheduleSchema, 'body'), (req, res, next) => {  
+router.post('/', validatorHandler(createScheduleSchema, 'body'), async (req, res, next) => {  
   try {
     const body = req.body;
-    const schedule = service.create(body);
+    const schedule = await service.create(body);
 
     res.json({
       'success': true, 
@@ -44,11 +45,11 @@ router.post('/', validatorHandler(createScheduleSchema, 'body'), (req, res, next
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidShedule, 'params'),  (req, res, next) => {
+router.get('/:id', validatorHandler(getValidShedule, 'params'),  async (req, res, next) => {
   try{
     const {id} = req.params;
 
-    const schedule =  service.findOne(id);
+    const schedule =  await service.findOne(id);
     res.json({
       'success': true,
       'message': 'Este es el horario encontrado',
@@ -62,11 +63,11 @@ router.get('/:id', validatorHandler(getValidShedule, 'params'),  (req, res, next
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidShedule, 'params'), validatorHandler(updateSheduleSchema, 'body'), (req, res, next) => {
+router.patch('/:id', validatorHandler(getValidShedule, 'params'), validatorHandler(updateSheduleSchema, 'body'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
-    const { old, changed} = service.update(id, data);
+    const { old, changed} = await service.update(id, data);
     res.json({
       'success': true,
       'message': "Se ha actualizado el siguiente horario",
@@ -81,10 +82,10 @@ router.patch('/:id', validatorHandler(getValidShedule, 'params'), validatorHandl
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidShedule, 'params'), (req, res, next) => {
+router.delete('/:id', validatorHandler(getValidShedule, 'params'), async (req, res, next) => {
   try {
     const { id } = req.params;
-    const schedule = service.delete(id);
+    const schedule = await service.delete(id);
     res.json({
       'success': true,
       'message': "Se ha eliminado este horario",

@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
-const id = Joi.string().uuid();
-const gameID = Joi.string().uuid();
+const id = Joi.string();
+const gameID = Joi.string();
 const name = Joi.string();
 const image = Joi.string();
 const index = Joi.number().integer();

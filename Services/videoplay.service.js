@@ -1,85 +1,105 @@
-const faker = require('faker');
+const VideoPlayModel = require('../Models/user.model');
+
+const errNotFound = "No se logró encontrar lo buscado";
+const errEmpty = "Aún no hay cuentas creadas";
 
 const boom = require('@hapi/boom');
 
 class VideoPlayService{
 
-  constructor(){
-    this.videoPlays = [];
-    this.generate();
-  }
+   //FIND ALL INFO
+   async find(limit, filter){
 
-  //GENERATE RANDOM INFO 
-  generate(){
-    const limit = 100;
-    for (let index = 0; index < limit; index++)
-      this.videoPlays.push({
-        id: faker.datatype.uuid(),
-        date: faker.date.future(),
-        gameID: faker.datatype.uuid(),
-        userID: faker.datatype.uuid(),
-        conten: faker.lorem.sentence(),
-        multimediaID: faker.datatype.uuid()
-      });   
-  }
-
-  //FIND ALL INFO
-  find(size){
-    const videoPlays = this.videoPlays.filter((item, index) => item && index < size);
-    if(!videoPlays)
-      throw boom.notFound("No se encontro el catalogo deseado");
+    let videoPlays = await VideoPlayModel.find(filter);
+    
+    if(videoPlays == undefined || videoPlays == null)
+      throw boom.notFound(errNotFound);
     else if (videoPlays.length <= 0 )
-      throw boom.notFound("Aún no hay cuentas creadas");
+      throw boom.notFound(errEmpty);
+
+    videoPlays = videoPlays.filter((item, index) => item && index < limit);
     return videoPlays;
+
   }
 
   //CREATE INFO
-  create(data){
-    const newvideoPlay = {
-      id: faker.datatype.uuid(),
-      ...data //PASA TODOS LOS ELEMENTOS Y LOS COMBINA
-    }
-    this.videoPlays.push(newvideoPlay);
-    return newvideoPlay;
+  async create(data){
+    const newVideoPlay = new VideoPlayModel(data);
+    await newVideoPlay.save(); 
+    return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  findOne(id){
-    const videoPlay = this.videoPlays.find((item) => item.id === id)
-    if(!videoPlay)
-      throw boom.notFound('La cuenta no fue encontrada');
+  async findOne(id){
+
+    const videoPlay = await VideoPlayModel.findOne({
+      _id:id
+    })
+
+    if(videoPlay == undefined || videoPlay == null)
+      throw boom.notFound(errNotFound);
+    else if (videoPlay.length <= 0 )
+      throw boom.notFound(errEmpty);
+
     return videoPlay;
 
   }
 
   //EDIT SPECIFIC ACCOUNT
-  update(id, changes){
-    const index = this.videoPlays.findIndex(item => item.id === id);
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+  async update(id, changes){
+
+    let videoPlay = await VideoPlayModel.findOne({
+      _id:id
+    });
     
-    var currentvideoPlay = this.videoPlays[index];
-    this.videoPlays[index] =  {
-      ...currentvideoPlay, 
-      ...changes
+    if(videoPlay == undefined || videoPlay == null)
+      throw boom.notFound(errNotFound);
+    if(videoPlay.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    let originalVideoPlay = {
+      date:videoPlay.date,
+      gameID:videoPlay.gameID,
+      userID:videoPlay.userID,
+      content:videoPlay.content,
+      multimediaID:videoPlay.usermultimediaIDID
     };
 
+    const {date, gameID, userID, content, multimediaID} = changes;
+
+    if(date)
+      videoPlay.date = date
+    if(gameID)
+      videoPlay.gameID = gameID
+    if(userID)
+      videoPlay.userID = userID
+    if(content)
+      videoPlay.content = content
+    if(multimediaID)
+      videoPlay.multimediaID = multimediaID
+
+    await videoPlay.save();
+    
     return {
-      old : currentvideoPlay, 
-      changed: this.videoPlays[index]
+      old : originalVideoPlay, 
+      changed: videoPlay
     };
   }
 
-  delete(id){
+  async delete(id){
     
-    const index = this.videoPlays.findIndex(item => item.id === id)
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+    let videoPlay = await VideoPlayModel.findOne({
+      _id:id
+    });
 
-    const currentvideoPlay = this.videoPlays[index];
+    const { deletedCount } = await VideoPlayModel.deleteOne({
+      _id:id
+    });
 
-    this.videoPlays.splice(index, 1);
-    return currentvideoPlay
+    if(deletedCount <= 0 )
+      throw boom.notFound(errEmpty);
+    
+    return videoPlay;
   }
    
 }

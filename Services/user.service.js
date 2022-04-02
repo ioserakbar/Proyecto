@@ -1,89 +1,120 @@
-const faker = require('faker');
-
+//const faker = require('faker');
 const boom = require('@hapi/boom');
+const UserModel = require('../Models/user.model');
+
+const errNotFound = "No se logró encontrar lo buscado";
+const errEmpty = "Aún no hay cuentas creadas";
+
 
 class UserService{
 
-  constructor(){
-    this.users = [];
-    this.generate();
-  }
-
-  //GENERATE RANDOM INFO 
-  generate(){
-    const limit = 100;
-    for (let index = 0; index < limit; index++)
-      this.users.push({
-        id: faker.datatype.uuid(),
-        name: faker.name.findName(),
-        age: faker.datatype.number(),
-        gender: faker.random.arrayElement(["male", "female", "other"]),
-        voicechat: faker.datatype.boolean(),
-        country: faker.address.country(),
-        schedule: faker.datatype.uuid(),
-        description: faker.lorem.sentence(),
-        profile: faker.lorem.sentence(),  
-        profilePic: faker.internet.avatar()
-      });   
-  }
+  
 
   //FIND ALL INFO
-  find(size){
-    const users = this.users.filter((item, index) => item && index < size);
-    if(!users)
-      throw boom.notFound("No se encontro el catalogo deseado");
-    else if (users.length <= 0 )
-      throw boom.notFound("Aún no hay cuentas creadas");
+  async find(limit, filter){
+    
+    let users = await UserModel.find(filter);
+    
+    if(users == undefined || users == null)
+      throw boom.notFound(errNotFound);
+    if(users.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    users = users.filter((item, index) => item && index < limit);
+    
     return users;
+
   }
 
   //CREATE INFO
-  create(data){
-    const newuser = {
-      id: faker.datatype.uuid(),
-      ...data //PASA TODOS LOS ELEMENTOS Y LOS COMBINA
-    }
-    this.users.push(newuser);
-    return newuser;
+  async create(data){
+
+    const newUser = new UserModel(data);
+    await newUser.save(); 
+    return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  findOne(id){
-    const user = this.users.find((item) => item.id === id)
-    if(!user)
-      throw boom.notFound('La cuenta no fue encontrada');
+  async findOne(id){
+    const user = await UserModel.findOne({
+      _id:id
+    })
+
+    if(user == undefined || user == null)
+      throw boom.notFound(errNotFound);
+    if(user.length <= 0 )
+      throw boom.notFound(errEmpty);
+
     return user;
 
   }
 
   //EDIT SPECIFIC ACCOUNT
-  update(id, changes){
-    const index = this.users.findIndex(item => item.id === id);
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+  async update(id, changes){
     
-    var currentuser = this.users[index];
-    this.users[index] =  {
-      ...currentuser, 
-      ...changes
+    let user = await UserModel.findOne({
+      _id:id
+    });
+
+    if(user == undefined || user == null)
+      throw boom.notFound(errNotFound);
+    if(user.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    let originalUser = {
+      name:user.name,
+      age:user.age,
+      gender:user.gender,
+      voicechat:user.voicechat,
+      countryID: user.countryID,
+      scheduleID: user.scheduleID,
+      description:user.description,
+      profile: user.profile,
+      profilePic:user.profilePic
     };
 
+    const {name, age, gender, voicechat, countryID, scheduleID, description, profile, profilePic} = changes;
+
+    if(name)
+      user.name = name;
+    if(age)
+      user.age = age;
+    if(gender)
+      user.gender = gender;
+    if(voicechat)
+      user.voicechat = voicechat;
+    if(countryID)
+      user.countryID = countryID;
+    if(scheduleID)
+      user.scheduleID = scheduleID;
+    if(description)
+      user.description = description;
+    if(profile)
+      user.profile = profile;
+    if(profilePic)
+      user.profilePic = profilePic;
+    
+    await user.save();
+    
     return {
-      old : currentuser, 
-      changed: this.users[index]
+      old : originalUser, 
+      changed: user
     };
   }
 
-  delete(id){
+  async delete(id){
+    let user = await UserModel.findOne({
+      _id:id
+    });
+
+    const { deletedCount } = await UserModel.deleteOne({
+      _id:id
+    });
+
+    if(deletedCount <= 0 )
+      throw boom.notFound(errEmpty);
     
-    const index = this.users.findIndex(item => item.id === id)
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
-
-    const currentuser = this.users[index];
-
-    this.users.splice(index, 1);
-    return currentuser
+    return user;
   }
    
 }

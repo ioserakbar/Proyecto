@@ -1,87 +1,109 @@
-const faker = require('faker');
-
 const boom = require('@hapi/boom');
 
+const MessageModel = require("../Models/message.model")
+const errNotFound = "No se logró encontrar lo buscado";
+const errEmpty = "Aún no hay cuentas creadas";
 class MessageService{
 
-  constructor(){
-    this.messages = [];
-    this.generate();
-  }
-
-  //GENERATE RANDOM INFO 
-  generate(){
-    const limit = 100;
-    for (let index = 0; index < limit; index++)
-      this.messages.push({
-        id: faker.datatype.uuid(),
-        content: faker.lorem.sentence(),
-        multimediaID: faker.datatype.uuid(),
-        date: faker.date.future(),
-        hour: faker.date.future(),
-        userSenderID: faker.datatype.uuid(),
-        chatRoomID: faker.datatype.uuid(),
-      });   
-  }
-
   //FIND ALL INFO
-  find(size){
-    const messages = this.messages.filter((item, index) => item && index < size);
-    if(!messages)
-      throw boom.notFound("No se encontro el catalogo deseado");
+  async find(limit, filter){
+
+    let messages = await MessageModel.find(filter);
+    
+
+    if(messages == undefined || messages == null)
+      throw boom.notFound(errNotFound);
     else if (messages.length <= 0 )
-      throw boom.notFound("Aún no hay cuentas creadas");
+      throw boom.notFound(errEmpty);
+
+    messages = messages.filter((item, index) => item && index < limit);
     return messages;
+
   }
 
   //CREATE INFO
-  create(data){
-    const newmessage = {
-      id: faker.datatype.uuid(),
-      ...data //PASA TODOS LOS ELEMENTOS Y LOS COMBINA
-    }
-    this.messages.push(newmessage);
-    return newmessage;
+  async create(data){
+    const newMessage = new MessageModel(data);
+    await newMessage.save(); 
+    return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  findOne(id){
-    const message = this.messages.find((item) => item.id === id)
-    if(!message)
-      throw boom.notFound('La cuenta no fue encontrada');
+  async findOne(id){
+
+    const message = await MessageModel.findOne({
+      _id:id
+    })
+
+    if(message == undefined || message == null)
+      throw boom.notFound(errNotFound);
+    else if (message.length <= 0 )
+      throw boom.notFound(errEmpty);
+
     return message;
 
   }
 
   //EDIT SPECIFIC ACCOUNT
-  update(id, changes){
-    const index = this.messages.findIndex(item => item.id === id);
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+  async update(id, changes){
+
+    let message = await MessageModel.findOne({
+      _id:id
+    });
     
-    var currentmessage = this.messages[index];
-    this.messages[index] =  {
-      ...currentmessage, 
-      ...changes
+    if(message == undefined || message == null)
+      throw boom.notFound(errNotFound);
+    if(message.length <= 0 )
+      throw boom.notFound(errEmpty);
+
+    let originalMessage = {
+      content:message.content,
+      multimediaID:message.multimediaID,
+      date:message.date,
+      hour:message.hour,
+      userSenderID:message.userSenderID,
+      chatRoomID:message.chatRoomID
     };
 
+    const {content, multimediaID, date, hour, userSenderID, chatRoomID} = changes;
+
+    if(content)
+      message.content = content
+    if(multimediaID)
+      message.multimediaID = multimediaID
+    if(date)
+      message.date = date
+    if(hour)
+      message.hour = hour
+    if(userSenderID)
+      message.userSenderID = userSenderID
+    if(chatRoomID)
+      message.chatRoomID = chatRoomID
+
+    await message.save();
+    
     return {
-      old : currentmessage, 
-      changed: this.messages[index]
+      old : originalMessage, 
+      changed: message
     };
   }
 
-  delete(id){
+  async delete(id){
     
-    const index = this.messages.findIndex(item => item.id === id)
-    if(index === -1)
-      throw boom.notFound("La cuenta no fue encontrada");
+    let message = await MessageModel.findOne({
+      _id:id
+    });
 
-    const currentmessage = this.messages[index];
+    const { deletedCount } = await MessageModel.deleteOne({
+      _id:id
+    });
 
-    this.messages.splice(index, 1);
-    return currentmessage
+    if(deletedCount <= 0 )
+      throw boom.notFound(errEmpty);
+    
+    return message;
   }
+    
    
 }
 
