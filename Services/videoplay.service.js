@@ -62,21 +62,21 @@ class VideoPlayService{
       gameID:videoPlay.gameID,
       userID:videoPlay.userID,
       content:videoPlay.content,
-      multimediaID:videoPlay.usermultimediaIDID
+      multimedia:videoPlay.usermultimedia
     };
 
-    const {date, gameID, userID, content, multimediaID} = changes;
+    const {date, gameID, userID, content, multimedia} = changes;
 
     if(date)
-      videoPlay.date = date
+      videoPlay.date = date;
     if(gameID)
-      videoPlay.gameID = gameID
+      videoPlay.gameID = gameID;
     if(userID)
-      videoPlay.userID = userID
+      videoPlay.userID = userID;
     if(content)
-      videoPlay.content = content
-    if(multimediaID)
-      videoPlay.multimediaID = multimediaID
+      videoPlay.content = content;
+    if(multimedia)
+      videoPlay.multimedia = multimedia;
 
     await videoPlay.save();
     

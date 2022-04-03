@@ -2,11 +2,12 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const  commentSchema = new Schema ({
-  id:String,
-  publicationID:String,
-  userID:String,
-  content:String
+const commentSchema = new Schema({
+  id: String,
+  publicationID: String,
+  userID: String,
+  content: String,
+  multimedia: Array
 })
 
 const modelComment = mongoose.model('comment', commentSchema);

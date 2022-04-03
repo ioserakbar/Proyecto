@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const  recommendedSchema = new Schema ({
-  id:String,
-  recommendedUser:String,
-  userID:String
+const recommendedSchema = new Schema({
+  id: String,
+  recommendedUser: String,
+  userID: String
 })
 
 const modelRecommended = mongoose.model('recommended', recommendedSchema);

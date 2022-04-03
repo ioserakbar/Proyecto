@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 mongoose.set('debug', true);
-const  countrySchema = new Schema ({
-  id:String,
-  name:String,
-  flag:String
+const countrySchema = new Schema({
+  id: String,
+  name: String,
+  flagImage: Array
 })
 
 const modelCountry = mongoose.model('country', countrySchema);

@@ -6,43 +6,43 @@ const errNotFound = "No se logró encontrar lo buscado";
 const errEmpty = "Aún no hay cuentas creadas";
 
 
-class UserService{
+class UserService {
 
-  
+
 
   //FIND ALL INFO
-  async find(limit, filter){
-    
+  async find(limit, filter) {
+
     let users = await UserModel.find(filter);
-    
-    if(users == undefined || users == null)
+
+    if (users == undefined || users == null)
       throw boom.notFound(errNotFound);
-    if(users.length <= 0 )
+    if (users.length <= 0)
       throw boom.notFound(errEmpty);
 
     users = users.filter((item, index) => item && index < limit);
-    
+
     return users;
 
   }
 
   //CREATE INFO
-  async create(data){
+  async create(data) {
 
     const newUser = new UserModel(data);
-    await newUser.save(); 
+    await newUser.save();
     return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  async findOne(id){
+  async findOne(id) {
     const user = await UserModel.findOne({
-      _id:id
+      _id: id
     })
 
-    if(user == undefined || user == null)
+    if (user == undefined || user == null)
       throw boom.notFound(errNotFound);
-    if(user.length <= 0 )
+    if (user.length <= 0)
       throw boom.notFound(errEmpty);
 
     return user;
@@ -50,73 +50,109 @@ class UserService{
   }
 
   //EDIT SPECIFIC ACCOUNT
-  async update(id, changes){
-    
-    let user = await UserModel.findOne({
-      _id:id
+  async update(id, changes) {
+
+    let userToChange = await UserModel.findOne({
+      _id: id
     });
 
-    if(user == undefined || user == null)
+    if (userToChange == undefined || userToChange == null)
       throw boom.notFound(errNotFound);
-    if(user.length <= 0 )
+    if (userToChange.length <= 0)
       throw boom.notFound(errEmpty);
 
     let originalUser = {
-      name:user.name,
-      age:user.age,
-      gender:user.gender,
-      voicechat:user.voicechat,
-      countryID: user.countryID,
-      scheduleID: user.scheduleID,
-      description:user.description,
-      profile: user.profile,
-      profilePic:user.profilePic
+      name: userToChange.name,
+      age: userToChange.age,
+      gender: userToChange.gender,
+      voicechat: userToChange.voicechat,
+      countryID: userToChange.countryID,
+      schedule: userToChange.schedule,
+      description: userToChange.description,
+      profile: userToChange.profile,
+      profilePic: userToChange.profilePic,
+      user: userToChange.user,
+      password: userToChange.password,
+      email: userToChange.email,
+      linkedAccounts: userToChange.linkedAccounts,
+      friends: userToChange.friends,
+      favoriteGames: userToChange.favoriteGames
     };
 
-    const {name, age, gender, voicechat, countryID, scheduleID, description, profile, profilePic} = changes;
+    const {
+      name,
+      age,
+      gender,
+      voicechat,
+      countryID,
+      schedule,
+      description,
+      profile,
+      profilePic,
+      user,
+      password,
+      email,
+      linkedAccounts,
+      friends,
+      favoriteGames
+    } = changes;
 
-    if(name)
-      user.name = name;
-    if(age)
-      user.age = age;
-    if(gender)
-      user.gender = gender;
-    if(voicechat)
-      user.voicechat = voicechat;
-    if(countryID)
-      user.countryID = countryID;
-    if(scheduleID)
-      user.scheduleID = scheduleID;
-    if(description)
-      user.description = description;
-    if(profile)
-      user.profile = profile;
-    if(profilePic)
-      user.profilePic = profilePic;
-    
-    await user.save();
-    
+    if (name)
+      userToChange.name = name;
+    if (age)
+      userToChange.age = age;
+    if (gender)
+      userToChange.gender = gender;
+    if (voicechat)
+      userToChange.voicechat = voicechat;
+    if (countryID)
+      userToChange.countryID = countryID;
+    if (schedule)
+      userToChange.schedule = schedule;
+    if (description)
+      userToChange.description = description;
+    if (profile)
+      userToChange.profile = profile;
+    if (profilePic)
+      userToChange.profilePic = profilePic;
+    if (user)
+      userToChange.user = user
+    if (password)
+      userToChange.password = password
+    if (email)
+      userToChange.email = email
+    if (linkedAccounts)
+      userToChange.linkedAccounts = linkedAccounts
+    if (friends)
+      userToChange.friends = friends
+    if (favoriteGames)
+      userToChange.favoriteGames = favoriteGames
+
+    await userToChange.save();
+
     return {
-      old : originalUser, 
-      changed: user
+      old: originalUser,
+      changed: userToChange
     };
   }
 
-  async delete(id){
+  async delete(id) {
     let user = await UserModel.findOne({
-      _id:id
+      _id: id
     });
 
-    const { deletedCount } = await UserModel.deleteOne({
-      _id:id
+    const {
+      deletedCount
+    } = await UserModel.deleteOne({
+      _id: id
     });
 
-    if(deletedCount <= 0 )
+    if (deletedCount <= 0)
       throw boom.notFound(errEmpty);
-    
+
     return user;
   }
-   
+
 }
 
 module.exports = UserService;

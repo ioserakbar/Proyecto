@@ -3,14 +3,14 @@ const isProd = process.env.NODE_ENV === 'production';
 
 module.exports  =
 {
-  mode: isProd,
+  mode: isProd ? 'production' : 'development',
   output:{
     filename: 'app.bundle.js',
   },
   plugins:[
     new HtmlWebPackPlugin(
       {
-        template: 'src'
+        template: 'Src/index.html'
       }
     )
   ],
@@ -18,7 +18,7 @@ module.exports  =
   {
     rules: [
       {
-        test: /|.js$/,
+        test: /\.js$/,
         exclude: /node_modules/,
         use:{
           loader: 'babel-loader',

@@ -59,10 +59,11 @@ class PublicationService{
     let originalNotRecommended = {
       date:publication.date,
       content:publication.content,
-      userID:publication.userID
+      userID:publication.userID,
+      multimedia: publication.multimedia
     };
 
-    const {date, content, userID} = changes;
+    const {date, content, userID, multimedia} = changes;
 
     if(date)
       publication.date = date
@@ -70,7 +71,8 @@ class PublicationService{
       publication.content = content
     if(userID)
       publication.content = userID
-
+    if(multimedia)
+      publication.multimedia = multimedia
     await publication.save();
     
     return {

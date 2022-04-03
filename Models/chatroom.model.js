@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const chatroomSchema = new Schema ({
-  id:String,
-  userOne:String,
-  userTwo:String
+const chatroomSchema = new Schema({
+  id: String,
+  userOne: String,
+  userTwo: String
 })
 
 const modelChatroom = mongoose.model('chatRoom', chatroomSchema);

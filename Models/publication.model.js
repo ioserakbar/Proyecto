@@ -2,11 +2,12 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const  publicationSchema = new Schema ({
-  id:String,
-  date:Date,
-  content:String,
-  userID:String
+const publicationSchema = new Schema({
+  id: String,
+  date: Date,
+  content: String,
+  userID: String,
+  multimedia: Array
 })
 
 const modelPublication = mongoose.model('publication', publicationSchema);

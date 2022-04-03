@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const  videoPlaySchema = new Schema ({
-  id:String,
-  date:Date,
-  gameID:String,
-  userID:String,
-  content:String,
-  multimediaID:String
+const videoPlaySchema = new Schema({
+  id: String,
+  date: Date,
+  gameID: String,
+  userID: String,
+  content: String,
+  multimedia: String
 })
 
 const modelVideoPlay = mongoose.model('videoPlay', videoPlaySchema);

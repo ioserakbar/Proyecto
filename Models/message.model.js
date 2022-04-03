@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const  messageSchema = new Schema ({
-  id:String,
-  content:String,
-  multimediaID:String,
+const messageSchema = new Schema({
+  id: String,
+  content: String,
+  multimediaID: String,
   date: Date,
-  hour:String,
+  hour: String,
   userSenderID: String,
   chatRoomID: String
 })

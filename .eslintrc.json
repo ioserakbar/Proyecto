@@ -1,3 +1,26 @@
+// //html config
+// { "parser": "babel-eslint",
+//   "parserOptions":{
+//     "sourceType": "module",
+//     "allowImportExportEverywhere": true
+//   },
+//   "extends": ["eslint:recommended", "prettier"],
+//   "env":{
+//     "es6": true,
+//     "node": true,
+//     "jest": true
+//   },
+//   "rules": {
+//     "no-console": "warn"
+//   }
+ 
+  
+// }
+
+
+
+
+//api config
 {
   "parserOptions":{
     "ecmaVersion": 2018

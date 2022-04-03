@@ -2,17 +2,23 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const  userSchema = new Schema ({
-  id:String,
-  name:String,
-  age:Number,
-  gender:String,
-  voicechat:Boolean,
+const userSchema = new Schema({
+  id: mongoose.Types.ObjectId,
+  name: String,
+  age: Number,
+  gender: String,
+  voicechat: Boolean,
   countryID: String,
-  scheduleID: String,
-  description:String,
+  schedule: Object,
+  description: String,
   profile: String,
-  profilePic:String
+  profilePic: String,
+  user: String,
+  password: String,
+  email: String,
+  linkedAccounts: Array,
+  friends: Array,
+  favoriteGames: Array
 })
 
 const modelUser = mongoose.model('user', userSchema);

@@ -15,7 +15,11 @@ const updateChatroomSchema = Joi.object({
 });
 
 const getValidChatroom = Joi.object({
-  id:id.required()
+  id: id.required()
 });
 
-module.exports = { createChatroomSchema, updateChatroomSchema, getValidChatroom };
+module.exports = {
+  createChatroomSchema,
+  updateChatroomSchema,
+  getValidChatroom
+};

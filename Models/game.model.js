@@ -1,13 +1,13 @@
-
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const  gameSchema = new Schema ({
-  id:String,
-  name:String,
-  developers:String,
+const gameSchema = new Schema({
+  id: String,
+  name: String,
+  developers: String,
   image: String,
+  ranking: Array
 })
 
 const modelGame = mongoose.model('game', gameSchema);

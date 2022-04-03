@@ -5,26 +5,34 @@ const date = Joi.date();
 const gameID = Joi.string();
 const userID = Joi.string();
 const content = Joi.string().max(250);
-const multimediaID = Joi.string();
+const multimedia = Joi.object().keys({
+  name: Joi.string(),
+  path: Joi.string(),
+  extention: Joi.string().max(6)
+});
 
 const createVideoplaySchema = Joi.object({
-  date:date.required(),
-  gameID:gameID.required(),
-  userID:userID.required(),
+  date: date.required(),
+  gameID: gameID.required(),
+  userID: userID.required(),
   conten: content,
-  multimediaID: multimediaID.required()
+  multimedia: multimedia.required()
 });
 
 const updateVideoplaySchema = Joi.object({
-  date:date,
-  gameID:gameID,
-  userID:userID,
+  date: date,
+  gameID: gameID,
+  userID: userID,
   conten: content,
-  multimediaID: multimediaID
+  multimedia: multimedia
 });
 
 const getValidVideoplay = Joi.object({
-  id:id.required()
+  id: id.required()
 });
 
-module.exports = { createVideoplaySchema, updateVideoplaySchema, getValidVideoplay };
+module.exports = {
+  createVideoplaySchema,
+  updateVideoplaySchema,
+  getValidVideoplay
+};

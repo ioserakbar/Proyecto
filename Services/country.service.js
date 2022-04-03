@@ -58,15 +58,15 @@ class CountryService{
 
     let originalCountrie = {
       name:countrie.name,
-      flag:countrie.flag
+      flagImage:countrie.flagImage
     };
 
-    const {name, flag} = changes;
+    const {name, flagImage} = changes;
 
     if(name)
     countrie.name = name
-    if(flag)
-    countrie.flag = flag
+    if(flagImage)
+    countrie.flagImage = flagImage
 
     await countrie.save();
     return {
