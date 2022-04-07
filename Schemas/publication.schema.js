@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 const id = Joi.string();
 const date = Joi.date();
-const content = Joi.string().min(1).max(1000);
+const content = Joi.string().min(1).max(5000);
 const userId = Joi.string();
 const multimedia = Joi.array().items(
   Joi.object().keys({
@@ -11,11 +11,19 @@ const multimedia = Joi.array().items(
     extention: Joi.string().max(6)
   })
 );
+const stats = Joi.array().items(
+  Joi.object().keys({
+    userID: Joi.string(),
+    like: Joi.boolean(),
+    dislike: Joi.boolean()
+  })
+);
 
 const createPublicationSchema = Joi.object({
   date: date.required(),
   content: content.required(),
   userID: userId.required(),
+  stats: stats,
   multimedia: multimedia
 });
 
@@ -23,6 +31,7 @@ const updatePublicationSchema = Joi.object({
   date: date,
   content: content,
   userId: userId,
+  stats: stats,
   multimedia: multimedia
 });
 

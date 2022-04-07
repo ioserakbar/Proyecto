@@ -4,16 +4,16 @@ const errEmpty = "Aún no hay cuentas creadas";
 
 const boom = require('@hapi/boom');
 
-class PublicationService{
+class PublicationService {
 
   //FIND ALL INFO
-  async find(limit, filter){
+  async find(limit, filter) {
 
     let publications = await PublicationModel.find(filter);
-    
-    if(publications == undefined || publications == null)
+
+    if (publications == undefined || publications == null)
       throw boom.notFound(errNotFound);
-    else if (publications.length <= 0 )
+    else if (publications.length <= 0)
       throw boom.notFound(errEmpty);
 
     publications = publications.filter((item, index) => item && index < limit);
@@ -22,22 +22,22 @@ class PublicationService{
   }
 
   //CREATE INFO
-  async create(data){
+  async create(data) {
     const newPublication = new PublicationModel(data);
-    await newPublication.save(); 
+    await newPublication.save();
     return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  async findOne(id){
+  async findOne(id) {
 
     const publication = await PublicationModel.findOne({
-      _id:id
+      _id: id
     })
 
-    if(publication == undefined || publication == null)
+    if (publication == undefined || publication == null)
       throw boom.notFound(errNotFound);
-    else if (publication.length <= 0 )
+    else if (publication.length <= 0)
       throw boom.notFound(errEmpty);
 
     return publication;
@@ -45,58 +45,62 @@ class PublicationService{
   }
 
   //EDIT SPECIFIC ACCOUNT
-  async update(id, changes){
+  async update(id, changes) {
 
     let publication = await PublicationModel.findOne({
-      _id:id
+      _id: id
     });
-    
-    if(publication == undefined || publication == null)
+
+    if (publication == undefined || publication == null)
       throw boom.notFound(errNotFound);
-    if(publication.length <= 0 )
+    if (publication.length <= 0)
       throw boom.notFound(errEmpty);
 
     let originalNotRecommended = {
-      date:publication.date,
-      content:publication.content,
-      userID:publication.userID,
-      multimedia: publication.multimedia
+      date: publication.date,
+      content: publication.content,
+      userID: publication.userID,
+      multimedia: publication.multimedia,
+      stats: publication.stats
     };
 
-    const {date, content, userID, multimedia} = changes;
+    const { date, content, userID, multimedia, stats } = changes;
 
-    if(date)
+    if (date)
       publication.date = date
-    if(content)
+    if (content)
       publication.content = content
-    if(userID)
+    if (userID)
       publication.content = userID
-    if(multimedia)
+    if (multimedia)
       publication.multimedia = multimedia
+    if (stats)
+      publication.stats = stats
+      
     await publication.save();
-    
+
     return {
-      old : originalNotRecommended, 
+      old: originalNotRecommended,
       changed: publication
     };
   }
 
-  async delete(id){
-    
+  async delete(id) {
+
     let publication = await PublicationModel.findOne({
-      _id:id
+      _id: id
     });
 
     const { deletedCount } = await PublicationModel.deleteOne({
-      _id:id
+      _id: id
     });
 
-    if(deletedCount <= 0 )
+    if (deletedCount <= 0)
       throw boom.notFound(errEmpty);
-    
+
     return publication;
   }
-   
+
 }
 
 module.exports = PublicationService;

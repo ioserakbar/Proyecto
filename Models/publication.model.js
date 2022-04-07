@@ -7,7 +7,8 @@ const publicationSchema = new Schema({
   date: Date,
   content: String,
   userID: String,
-  multimedia: Array
+  multimedia: Array,
+  stats: Array
 })
 
 const modelPublication = mongoose.model('publication', publicationSchema);
