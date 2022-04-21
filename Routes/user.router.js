@@ -1,4 +1,4 @@
-const express= require('express');
+const express = require('express');
 const router = express.Router();
 const Service = require('../Services/user.service');
 const service = new Service();
@@ -9,10 +9,22 @@ const { createUserSchema, updateUserSchema, getValidUser } = require('../Schemas
 //GET ALL PRODUCTS
 router.get('/', async (req, res, next) => {
 
-  try{
+  try {
 
-    const {size} = req.query;
-    const filter = req.body;
+    const { size, e, p } = req.query;
+    const filter = {}; 
+
+    if(e){
+      Object.assign(filter, {
+        email: e
+      })
+    }
+
+    if(p){
+      Object.assign(filter, {
+        password: p
+      })
+    }
 
     const users = await service.find(size || 10, filter)
     res.json({
@@ -21,48 +33,49 @@ router.get('/', async (req, res, next) => {
       'Data': users
     });
 
-  } catch (error){
-    next(error);
-  }
-
-});
- 
-//CREATE PRODUCTS
-router.post('/', validatorHandler(createUserSchema, 'body'), async (req, res, next) => {  
-  try {
-    const body = req.body;
-    const user = await service.create(body);
-
-    res.json({
-      'success': true, 
-      'message': "El usuario se ha creado con exito", 
-      'Data': user 
-   });
   } catch (error) {
     next(error);
   }
 
 });
-
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidUser, 'params'),  async (req, res, next) => {
+router.get('/:id', validatorHandler(getValidUser, 'params'), async (req, res, next) => {
 
-  try{
+  try {
 
-    const {id} = req.params;
-    const user =  await service.findOne(id);
+    const { id } = req.params;
+    const user = await service.findOne(id);
 
     res.json({
       'success': true,
       'message': 'Este es el usuario encontrado',
       'Data': user
     });
-  } catch (error){
+  } catch (error) {
     next(error);
   }
 
 });
+
+//CREATE PRODUCTS
+router.post('/', validatorHandler(createUserSchema, 'body'), async (req, res, next) => {
+  try {
+    const body = req.body;
+    const user = await service.create(body);
+
+    res.json({
+      'success': true,
+      'message': "El usuario se ha creado con exito",
+      'Data': user
+    });
+  } catch (error) {
+    next(error);
+  }
+
+});
+
+
 
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
@@ -72,9 +85,9 @@ router.patch('/:id', validatorHandler(getValidUser, 'params'), validatorHandler(
   try {
     const { id } = req.params;
     const data = req.body;
-    const { old, changed} = await service.update(id, data);
+    const { old, changed } = await service.update(id, data);
     res.json({
-      
+
       'success': true,
       'message': "Se ha actualizado el siguiente usuario",
       'Data': {
@@ -99,7 +112,7 @@ router.delete('/:id', validatorHandler(getValidUser, 'params'), async (req, res,
       'message': "Se ha eliminado este usuario",
       'Data': {
         "message": "Usuario eliminado",
-        "product" : user
+        "product": user
       }
     });
   } catch (error) {
