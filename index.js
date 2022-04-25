@@ -3,8 +3,9 @@ const cors = require('cors');
 const routerApi = require('./Routes');
 const { logErrors, boomErrorHandler, errorHandler } = require('./Middlewares/error.handler');
 const db = require('./db');
-const {DBCONNECTION} = require('./consts.json');
+const { DBCONNECTION } = require('./consts.json');
 const app = express();
+
 app.use(cors());
 const port = 3001;
 
@@ -20,8 +21,8 @@ app.use(boomErrorHandler);
 app.use(errorHandler);
 
 
-app.listen(port, () =>{
-  
+app.listen(port, () => {
+
   // eslint-disable-next-line no-console
   console.log("Este es mi puerto: " + port);
 });
