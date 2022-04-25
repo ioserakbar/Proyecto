@@ -32,7 +32,7 @@ class UserService {
 
     const newUser = new UserModel(data);
     await newUser.save();
-    return data;
+    return newUser;
   }
 
   //FIND SPECIFIC ACCOUNT

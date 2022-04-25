@@ -66,29 +66,42 @@ router.post('/', validatorHandler(createUserSchema, 'body'), async (req, res, ne
     const body = req.body;
 
     const { profilePic } = body;
-    const { name, path, extention } = profilePic;
-    const imagePath = PROFILEPICSDB + faker.datatype.uuid() + name + "." + extention;
-    fs.writeFile(imagePath, path, 'base64', async function (err) {
-      if (err){
-        console.log(err);
-        res.json({
-          'success': false,
-          'message': "La imagen tuvo un error al ser guardada."
-        });
-      }
-        
-      else {
 
-        body["profilePic"]["path"] = imagePath;
-        const user = await service.create(body);
+    var name = null, path = null, extention = null;
 
-        res.json({
-          'success': true,
-          'message': "El usuario se ha creado con exito",
-          'Data': user
-        });
-      }
-    })
+    if (profilePic) {
+      ({ name, path, extention } = profilePic);
+      const imagePath = PROFILEPICSDB + faker.datatype.uuid() + name + "." + extention;
+      fs.writeFile(imagePath, path, 'base64', async function (err) {
+        if (err) {
+          res.json({
+            'success': false,
+            'message': err
+          });
+        }
+
+        else {
+
+          body["profilePic"]["path"] = imagePath;
+          const user = await service.create(body);
+
+          res.json({
+            'success': true,
+            'message': "El usuario se ha creado con exito",
+            'Data': user
+          });
+        }
+      })
+    } else {
+      const user = await service.create(body);
+
+      res.json({
+        'success': true,
+        'message': "El usuario se ha creado con exito",
+        'Data': user
+      });
+    }
+
 
 
   } catch (error) {

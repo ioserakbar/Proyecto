@@ -53,7 +53,7 @@ const createUserSchema = Joi.object({
   age: age.required(),
   gender: gender,
   voicechat: voicechat.required(),
-  country: country.required(),
+  countryID: country.required(),
   schedule: schedule,
   description: description,
   profile: profile,
