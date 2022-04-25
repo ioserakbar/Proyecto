@@ -77,7 +77,8 @@ class UserService {
       email: userToChange.email,
       linkedAccounts: userToChange.linkedAccounts,
       friends: userToChange.friends,
-      favoriteGames: userToChange.favoriteGames
+      favoriteGames: userToChange.favoriteGames,
+      backgroundImg : userToChange.backgroundImg
     };
 
     const {
@@ -95,7 +96,8 @@ class UserService {
       email,
       linkedAccounts,
       friends,
-      favoriteGames
+      favoriteGames,
+      backgroundImg
     } = changes;
 
     if (name)
@@ -128,6 +130,8 @@ class UserService {
       userToChange.friends = friends
     if (favoriteGames)
       userToChange.favoriteGames = favoriteGames
+    if (backgroundImg)
+      userToChange.backgroundImg = backgroundImg
 
     await userToChange.save();
 

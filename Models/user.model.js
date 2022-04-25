@@ -20,7 +20,8 @@ const userSchema = new Schema({
   email: String,
   linkedAccounts: Array,
   friends: Array,
-  favoriteGames: Array
+  favoriteGames: Array,
+  backgroundIMG: Object
 })
 
 const modelUser = mongoose.model('user', userSchema);

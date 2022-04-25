@@ -8,6 +8,8 @@ const { PROFILEPICSDB } = require('../consts.json');
 const fs = require('fs');
 const faker = require('faker');
 
+
+
 //GET ALL PRODUCTS
 router.get('/', async (req, res, next) => {
 
@@ -70,6 +72,7 @@ router.post('/', validatorHandler(createUserSchema, 'body'), async (req, res, ne
     var name = null, path = null, extention = null;
 
     if (profilePic) {
+
       ({ name, path, extention } = profilePic);
       const imagePath = PROFILEPICSDB + faker.datatype.uuid() + name + "." + extention;
       fs.writeFile(imagePath, path, 'base64', async function (err) {
@@ -91,6 +94,7 @@ router.post('/', validatorHandler(createUserSchema, 'body'), async (req, res, ne
             'Data': user
           });
         }
+        
       })
     } else {
       const user = await service.create(body);

@@ -23,6 +23,11 @@ const profilePic = Joi.object().keys({
   path: Joi.string(),
   extention: Joi.string().max(6)
 });
+const backgroundImg = Joi.object().keys({
+  name: Joi.string(),
+  path: Joi.string(),
+  extention: Joi.string().max(6)
+});
 const user = Joi.string().min(2).max(25);
 const password = Joi.string().min(8).max(15);
 const email = Joi.string().email();
@@ -63,7 +68,8 @@ const createUserSchema = Joi.object({
   email: email.required(),
   linkedAccounts: linkedAccounts,
   friends: friends,
-  favoriteGames: favoriteGames
+  favoriteGames: favoriteGames,
+  backgroundImg:backgroundImg
 });
 
 const updateUserSchema = Joi.object({
@@ -81,7 +87,8 @@ const updateUserSchema = Joi.object({
   email: email,
   linkedAccounts: linkedAccounts,
   friends: friends,
-  favoriteGames: favoriteGames
+  favoriteGames: favoriteGames,
+  backgroundImg:backgroundImg
 });
 
 const getValidUser = Joi.object({
