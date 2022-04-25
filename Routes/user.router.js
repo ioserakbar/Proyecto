@@ -4,7 +4,9 @@ const Service = require('../Services/user.service');
 const service = new Service();
 const validatorHandler = require('./../Middlewares/validator.handler')
 const { createUserSchema, updateUserSchema, getValidUser } = require('../Schemas/user.schema');
-
+const { PROFILEPICSDB } = require('../consts.json');
+const fs = require('fs');
+const faker = require('faker');
 
 //GET ALL PRODUCTS
 router.get('/', async (req, res, next) => {
@@ -12,15 +14,15 @@ router.get('/', async (req, res, next) => {
   try {
 
     const { size, e, p } = req.query;
-    const filter = {}; 
+    const filter = {};
 
-    if(e){
+    if (e) {
       Object.assign(filter, {
         email: e
       })
     }
 
-    if(p){
+    if (p) {
       Object.assign(filter, {
         password: p
       })
@@ -62,13 +64,33 @@ router.get('/:id', validatorHandler(getValidUser, 'params'), async (req, res, ne
 router.post('/', validatorHandler(createUserSchema, 'body'), async (req, res, next) => {
   try {
     const body = req.body;
-    const user = await service.create(body);
 
-    res.json({
-      'success': true,
-      'message': "El usuario se ha creado con exito",
-      'Data': user
-    });
+    const { profilePic } = body;
+    const { name, path, extention } = profilePic;
+    const imagePath = PROFILEPICSDB + faker.datatype.uuid() + name + "." + extention;
+    fs.writeFile(imagePath, path, 'base64', async function (err) {
+      if (err){
+        console.log(err);
+        res.json({
+          'success': false,
+          'message': "La imagen tuvo un error al ser guardada."
+        });
+      }
+        
+      else {
+
+        body["profilePic"]["path"] = imagePath;
+        const user = await service.create(body);
+
+        res.json({
+          'success': true,
+          'message': "El usuario se ha creado con exito",
+          'Data': user
+        });
+      }
+    })
+
+
   } catch (error) {
     next(error);
   }

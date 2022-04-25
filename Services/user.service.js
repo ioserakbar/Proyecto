@@ -2,9 +2,10 @@
 const boom = require('@hapi/boom');
 const UserModel = require('../Models/user.model');
 
+
+
 const errNotFound = "No se logró encontrar lo buscado";
 const errEmpty = "Aún no hay cuentas creadas";
-
 
 class UserService {
 

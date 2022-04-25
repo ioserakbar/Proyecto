@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+
+
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -12,7 +14,7 @@ const userSchema = new Schema({
   schedule: Object,
   description: String,
   profile: String,
-  profilePic: String,
+  profilePic: Object,
   user: String,
   password: String,
   email: String,
