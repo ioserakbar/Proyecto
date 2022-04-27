@@ -1,4 +1,5 @@
 {
   "DBCONNECTION": "mongodb+srv://admin:admin@cluster0.qcxgk.mongodb.net/webII?retryWrites=true&w=majority",
-  "PROFILEPICSDB": "http://192.168.100.8:8080/IMGS/PROFILEPICS/"
+  "MULTIMEDIAURL":"https://gfindmultimediadb.blob.core.windows.net/",
+  "MULTIMEDIAPROFILEPICS":"profilepics"
 }

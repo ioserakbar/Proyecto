@@ -16,17 +16,17 @@ const schedule = Joi.object().keys({
   sabado: Joi.string().pattern(/^([0-9]{2}[:][0-9]{2}[ ]{1}[-]{1}[ ]{1}[0-9]{2}[:][0-9]{2})$/).min(13).max(13),
   domingo: Joi.string().pattern(/^([0-9]{2}[:][0-9]{2}[ ]{1}[-]{1}[ ]{1}[0-9]{2}[:][0-9]{2})$/).min(13).max(13)
 });
-const description = Joi.string().max(250);
+const description = Joi.string().max(500);
 const profile = Joi.string().max(100);
 const profilePic = Joi.object().keys({
   name: Joi.string(),
   path: Joi.string(),
-  extention: Joi.string().max(6)
+  extention: Joi.string().max(13)
 });
 const backgroundImg = Joi.object().keys({
   name: Joi.string(),
   path: Joi.string(),
-  extention: Joi.string().max(6)
+  extention: Joi.string().max(13)
 });
 const user = Joi.string().min(2).max(25);
 const password = Joi.string().min(8).max(15);

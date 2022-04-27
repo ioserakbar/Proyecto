@@ -4,10 +4,11 @@ const Service = require('../Services/user.service');
 const service = new Service();
 const validatorHandler = require('./../Middlewares/validator.handler')
 const { createUserSchema, updateUserSchema, getValidUser } = require('../Schemas/user.schema');
-const { PROFILEPICSDB } = require('../consts.json');
-const fs = require('fs');
 const faker = require('faker');
-
+const { MULTIMEDIAURL, MULTIMEDIAPROFILEPICS } = require('../consts.json');
+const azureStorage = require('azure-storage');
+const blobService = azureStorage.createBlobService();
+const containerName = 'profilepics';
 
 
 //GET ALL PRODUCTS
@@ -74,18 +75,25 @@ router.post('/', validatorHandler(createUserSchema, 'body'), async (req, res, ne
     if (profilePic) {
 
       ({ name, path, extention } = profilePic);
-      const imagePath = PROFILEPICSDB + faker.datatype.uuid() + name + "." + extention;
-      fs.writeFile(imagePath, path, 'base64', async function (err) {
+
+      name = faker.datatype.uuid() + name + "." + extention;
+
+      let buffer = new Buffer(path, 'base64')
+      await blobService.createBlockBlobFromText(containerName, name, buffer, {
+        contentType: extention
+      }, async function (err, result, response) {
         if (err) {
+
           res.json({
             'success': false,
             'message': err
           });
-        }
 
-        else {
+        } else {
 
-          body["profilePic"]["path"] = imagePath;
+          const fileURL =`${MULTIMEDIAURL}${MULTIMEDIAPROFILEPICS}/${name}`;
+
+          body["profilePic"]["path"] = fileURL;
           const user = await service.create(body);
 
           res.json({
@@ -93,9 +101,13 @@ router.post('/', validatorHandler(createUserSchema, 'body'), async (req, res, ne
             'message': "El usuario se ha creado con exito",
             'Data': user
           });
+
         }
-        
+
       })
+
+
+
     } else {
       const user = await service.create(body);
 

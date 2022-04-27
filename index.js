@@ -1,3 +1,8 @@
+
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
+
 const express = require('express');
 const cors = require('cors');
 const routerApi = require('./Routes');
@@ -5,14 +10,17 @@ const { logErrors, boomErrorHandler, errorHandler } = require('./Middlewares/err
 const db = require('./db');
 const { DBCONNECTION } = require('./consts.json');
 const app = express();
+const bodyParser = require('body-parser');
+const port = 3001;
+
 
 app.use(cors());
-const port = 3001;
 
 db(DBCONNECTION);
 
 //EL ORDEN DE INTANCIA ES IMPORTANTE
-app.use(express.json()); //UTILIZAMOS JSON COMO FORMATO DE DATOS 
+app.use(bodyParser.json()); //UTILIZAMOS JSON COMO FORMATO DE DATOS 
+app.use(bodyParser.urlencoded({ extended: false }));
 
 routerApi(app);//RUTAS DE NUESTRAS ENTIDADES
 //MIDDLEWARES CODIGO INTEMEDIARIO (MANEJO DE ERRORES Y VALIDACIONES JOI)
@@ -26,6 +34,4 @@ app.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log("Este es mi puerto: " + port);
 });
-
-
 
