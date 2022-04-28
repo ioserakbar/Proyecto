@@ -1,5 +1,7 @@
 {
   "DBCONNECTION": "mongodb+srv://admin:admin@cluster0.qcxgk.mongodb.net/webII?retryWrites=true&w=majority",
   "MULTIMEDIAURL":"https://gfindmultimediadb.blob.core.windows.net/",
-  "MULTIMEDIAPROFILEPICS":"profilepics"
+  "MULTIMEDIAPROFILEPICS":"profilepics/",
+  "MULTIMEDIABACKGROUNDPICS":"backgroundpics/",
+  "MULTIMEDIAPUBLICATIONS":"publications/"
 }

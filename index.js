@@ -19,7 +19,7 @@ app.use(cors());
 db(DBCONNECTION);
 
 //EL ORDEN DE INTANCIA ES IMPORTANTE
-app.use(bodyParser.json()); //UTILIZAMOS JSON COMO FORMATO DE DATOS 
+app.use(bodyParser.json({limit: '999mb'})); //UTILIZAMOS JSON COMO FORMATO DE DATOS 
 app.use(bodyParser.urlencoded({ extended: false }));
 
 routerApi(app);//RUTAS DE NUESTRAS ENTIDADES

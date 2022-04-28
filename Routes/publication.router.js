@@ -1,17 +1,21 @@
-const express= require('express');
+const express = require('express');
 const router = express.Router();
 const Service = require('../Services/publication.service');
 const service = new Service();
 const validatorHandler = require('./../Middlewares/validator.handler')
 const { createPublicationSchema, updatePublicationSchema, getValidPublication } = require('../Schemas/publication.schema');
-
-
+const faker = require('faker');
+const { MULTIMEDIAURL, MULTIMEDIAPUBLICATIONS } = require('../consts.json');
+const azureStorage = require('azure-storage');
+const blobService = azureStorage.createBlobService();
+const container = MULTIMEDIAPUBLICATIONS.split('/')[0];
+const  streamifier = require('streamifier');
 //GET ALL PRODUCTS
 router.get('/', async (req, res, next) => {
 
-  try{
+  try {
 
-    const {size} = req.query;
+    const { size } = req.query;
     const filter = req.body;
     const recommendeds = await service.find(size || 10, filter);
     res.json({
@@ -20,23 +24,79 @@ router.get('/', async (req, res, next) => {
       'Data': recommendeds
     });
 
-  } catch (error){
+  } catch (error) {
     next(error);
   }
 
 });
- 
+
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createPublicationSchema, 'body'), async (req, res, next) => {  
+router.post('/', validatorHandler(createPublicationSchema, 'body'), async (req, res, next) => {
   try {
     const body = req.body;
-    const recommended = await service.create(body);
 
-    res.json({
-      'success': true, 
-      'message': "La publicacion se ha creado con exito", 
-      'Data': recommended 
-   });
+
+    const { multimedia } = body;
+
+    //const recommended = await service.create(body);
+    if (multimedia) {
+      let multis = []
+      let index = 0;
+      for (const multi of multimedia) {
+
+        let { name, path, extention } = multi;
+
+        name = faker.datatype.uuid() + name + "." + extention;
+
+        let buffer = new Buffer(path, 'base64')
+        var stream = streamifier.createReadStream(buffer);
+        await blobService.createBlockBlobFromStream(container, name ,stream, buffer.byteLength, {
+          contentType: extention
+        }, async function (err) {
+          if (err) {
+
+            res.json({
+              'success': false,
+              'message': err
+            });
+
+          } else {
+
+            const fileURL = `${MULTIMEDIAURL}${MULTIMEDIAPUBLICATIONS}${name}`;
+            var obj = {};
+            obj['name'] = name;
+            obj['extention'] = extention;
+            obj['path'] = fileURL;
+            multis[`${index}`] = obj;
+            if(index === multimedia.length - 1){
+              body['multimedia'] = multis;
+              const publication = await service.create(body);
+              res.json({
+                'success': true,
+                'message': "El usuario se ha creado con exito",
+                'Data': publication
+              });
+            }
+            index++;
+          }
+
+        })
+
+      };
+
+     
+     
+
+
+    } else {
+      const publication = await service.create(body);
+
+      res.json({
+        'success': true,
+        'message': "El usuario se ha creado con exito",
+        'Data': publication
+      });
+    }
   } catch (error) {
     next(error);
   }
@@ -45,17 +105,17 @@ router.post('/', validatorHandler(createPublicationSchema, 'body'), async (req, 
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidPublication, 'params'),  async (req, res, next) => {
-  try{
-    const {id} = req.params;
+router.get('/:id', validatorHandler(getValidPublication, 'params'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-    const recommended =  await service.findOne(id);
+    const recommended = await service.findOne(id);
     res.json({
       'success': true,
       'message': 'Esta es la publicacion encontrada',
       'Data': recommended
     });
-  } catch (error){
+  } catch (error) {
     next(error);
   }
 });
@@ -67,7 +127,7 @@ router.patch('/:id', validatorHandler(getValidPublication, 'params'), validatorH
   try {
     const { id } = req.params;
     const data = req.body;
-    const { old, changed} = await service.update(id, data);
+    const { old, changed } = await service.update(id, data);
     res.json({
       'success': true,
       'message': "Se ha actualizado la publicacion encontrada",
@@ -91,7 +151,7 @@ router.delete('/:id', validatorHandler(getValidPublication, 'params'), async (re
       'message': "Se ha eliminado esta publicacion",
       'Data': {
         "message": "Publicaicon eliminada",
-        "Data" : recommended
+        "Data": recommended
       }
     });
   } catch (error) {

@@ -8,8 +8,7 @@ const faker = require('faker');
 const { MULTIMEDIAURL, MULTIMEDIAPROFILEPICS } = require('../consts.json');
 const azureStorage = require('azure-storage');
 const blobService = azureStorage.createBlobService();
-const containerName = 'profilepics';
-
+const container = MULTIMEDIAPROFILEPICS.split('/')[0]
 
 //GET ALL PRODUCTS
 router.get('/', async (req, res, next) => {
@@ -79,9 +78,9 @@ router.post('/', validatorHandler(createUserSchema, 'body'), async (req, res, ne
       name = faker.datatype.uuid() + name + "." + extention;
 
       let buffer = new Buffer(path, 'base64')
-      await blobService.createBlockBlobFromText(containerName, name, buffer, {
+      await blobService.createBlockBlobFromText(container, name, buffer, {
         contentType: extention
-      }, async function (err, result, response) {
+      }, async function (err) {
         if (err) {
 
           res.json({
@@ -91,7 +90,7 @@ router.post('/', validatorHandler(createUserSchema, 'body'), async (req, res, ne
 
         } else {
 
-          const fileURL =`${MULTIMEDIAURL}${MULTIMEDIAPROFILEPICS}/${name}`;
+          const fileURL =`${MULTIMEDIAURL}${MULTIMEDIAPROFILEPICS}${name}`;
 
           body["profilePic"]["path"] = fileURL;
           const user = await service.create(body);
