@@ -225,7 +225,6 @@ router.patch('/:id/statsChange', async (req, res, next) => {
     if (type === 'add') {
       data.stats.push(toAdd);
     } else if (type === 'remove') {
-      console.log('delete')
       data.stats.splice(indexToRemove, 1);
     }
 
