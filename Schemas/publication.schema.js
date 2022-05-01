@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 const id = Joi.string();
 const date = Joi.date();
-const content = Joi.string().min(1).max(5000);
+const content = Joi.string().min(0).max(5000);
 const userId = Joi.string();
 const multimedia = Joi.array().items(
   Joi.object().keys({
@@ -21,7 +21,7 @@ const stats = Joi.array().items(
 
 const createPublicationSchema = Joi.object({
   date: date.required(),
-  content: content.required(),
+  content: content,
   userID: userId.required(),
   stats: stats,
   multimedia: multimedia
