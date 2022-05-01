@@ -36,7 +36,10 @@ const updatePublicationSchema = Joi.object({
 });
 
 const getValidPublication = Joi.object({
-  id:id.required()
+  id:id.required(),
+  userID: userId
 });
+
+
 
 module.exports = { createPublicationSchema, updatePublicationSchema, getValidPublication };
