@@ -9,19 +9,32 @@ const multimedia = Joi.object().keys({
   path: Joi.string(),
   extention: Joi.string().max(13)
 });
+const stats = Joi.array().items(
+  Joi.object().keys({
+    userID: Joi.string(),
+    like: Joi.boolean(),
+    dislike: Joi.boolean()
+  })
+);
+
+const date = Joi.date()
 
 const createCommentchema = Joi.object({
   publicationID: publicationID.required(),
   userID: userID.required(),
   content: content,
-  multimedia: multimedia
+  multimedia: multimedia,
+  stats: stats,
+  date: date.required()
 });
 
 const updateCommentSchema = Joi.object({
   publicationID: publicationID,
   userID: userID,
   content: content,
-  multimedia: multimedia
+  multimedia: multimedia,
+  stats: stats,
+  date: date
 });
 
 const getValidComment = Joi.object({

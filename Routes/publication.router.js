@@ -214,12 +214,7 @@ router.patch('/:id/statsChange', async (req, res, next) => {
         toAdd.dislike = false;
       }
       type = 'add';
-
-
     }
-
-
-
 
     let data = { stats: stats };
     if (type === 'add') {

@@ -7,7 +7,8 @@ const commentSchema = new Schema({
   publicationID: String,
   userID: String,
   content: String,
-  multimedia: Object
+  multimedia: Object,
+  stats: Array
 })
 
 const modelComment = mongoose.model('comment', commentSchema);

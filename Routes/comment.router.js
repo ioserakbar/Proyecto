@@ -99,6 +99,82 @@ router.patch('/:id', validatorHandler(getValidComment, 'params'), validatorHandl
   }
 });
 
+router.patch('/:id/statsChange', async (req, res, next) => {
+  try {
+
+    const { id } = req.params;
+    const { statOption, userID } = req.body;
+    const comment = await service.findOne(id);
+    const stats = comment.stats;
+    let index = 0;
+    let toAdd = {};
+    let type = '';
+    let indexToRemove = 0;
+    if (stats.length > 0) {
+      stats.forEach(stat => {
+        if (stat.userID === userID) {
+          if (statOption === 'like') {
+            stat.like = true;
+            stat.dislike = false;
+          } else if (statOption === 'dislike') {
+            stat.like = false;
+            stat.dislike = true;
+          } else if (statOption === 'delete') {
+            type = 'remove';
+            indexToRemove = index;
+          }
+        }
+        else if (index === stats.length - 1) {
+          toAdd.userID = userID;
+          if (statOption === 'like') {
+            toAdd.like = true;
+            toAdd.dislike = false;
+          } else if (statOption === 'dislike') {
+            toAdd.like = false;
+            toAdd.dislike = true;
+          }
+          type = 'add';
+        }
+        index++;
+      });
+    } else {
+      toAdd.userID = userID;
+      if (statOption === 'like') {
+        toAdd.like = true;
+        toAdd.dislike = false;
+      } else if (statOption === 'dislike') {
+        toAdd.like = false;
+        toAdd.dislike = true;
+      } else {
+        toAdd.like = false;
+        toAdd.dislike = false;
+      }
+      type = 'add';
+    }
+
+    let data = { stats: stats };
+    if (type === 'add') {
+      data.stats.push(toAdd);
+    } else if (type === 'remove') {
+      data.stats.splice(indexToRemove, 1);
+    }
+
+    const { old, changed } = await service.update(id, data);
+    res.json({
+      'success': true,
+      'message': "Se ha actualizado la publicacion encontrada",
+      'Data': {
+        "Original": old.stats,
+        "Modificado": changed.stats
+      }
+    });
+
+
+  } catch (error) {
+    next(error);
+  }
+});
+
 //DELETE
 router.delete('/:id', validatorHandler(getValidComment, 'params'), async (req, res, next) => {
   try {

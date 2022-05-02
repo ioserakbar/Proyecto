@@ -63,19 +63,25 @@ class CommentService{
       publicationID:comment.publicationID,
       userID:comment.userID,
       content:comment.content,
-      multimedia:comment.multimedia
+      multimedia:comment.multimedia,
+      date:comment.date,
+      stats:comment.stats
     };
 
-    const {publicationID, userID, content, multimedia} = changes;
+    const {publicationID, userID, content, multimedia, date, stats} = changes;
 
     if(publicationID)
-      comment.publicationID = publicationID
+      comment.publicationID = publicationID;
     if(userID)
-      comment.userID = userID
+      comment.userID = userID;
     if(content)
-      comment.content = content
+      comment.content = content;
     if(multimedia)
-      comment.multimedia = multimedia
+      comment.multimedia = multimedia;
+    if(date)
+      comment.date = date;
+    if(stats)
+      comment.stats = stats;
 
     await comment.save();
     
