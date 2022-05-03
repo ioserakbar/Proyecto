@@ -15,8 +15,8 @@ class PublicationService {
       throw boom.notFound(errNotFound);
     else if (publications.length <= 0)
       throw boom.notFound(errEmpty);
-
-    publications = publications.filter((item, index) => item && index < limit);
+    if (limit)
+      publications = publications.filter((item, index) => item && index < limit);
     return publications;
 
   }

@@ -17,7 +17,7 @@ router.get('/', async (req, res, next) => {
 
     const { size } = req.query;
     const filter = req.body;
-    const recommendeds = await service.find(size || 10, filter);
+    const recommendeds = await service.find(size, filter);
     res.json({
       'success': true,
       'message': 'Estas son las publicaciones encontradas',
