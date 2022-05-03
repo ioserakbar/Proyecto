@@ -3,7 +3,7 @@ const Joi = require('joi');
 const id = Joi.string();
 const publicationID = Joi.string();
 const userID = Joi.string();
-const content = Joi.string().min(1).max(250);
+const content = Joi.string().min(0).max(250);
 const multimedia = Joi.object().keys({
   name: Joi.string(),
   path: Joi.string(),

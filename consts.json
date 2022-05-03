@@ -3,5 +3,6 @@
   "MULTIMEDIAURL":"https://gfindmultimediadb.blob.core.windows.net/",
   "MULTIMEDIAPROFILEPICS":"profilepics/",
   "MULTIMEDIABACKGROUNDPICS":"backgroundpics/",
-  "MULTIMEDIAPUBLICATIONS":"publications/"
+  "MULTIMEDIAPUBLICATIONS":"publications/",
+  "MULTIMEDIACOMMENTS":"comments/"
 }

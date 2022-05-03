@@ -4,7 +4,12 @@ const Service = require('../Services/comment.service');
 const service = new Service();
 const validatorHandler = require('./../Middlewares/validator.handler')
 const { createCommentchema, updateCommentSchema, getValidComment } = require('../Schemas/comment.schema');
-
+const { MULTIMEDIAURL, MULTIMEDIACOMMENTS } = require('../consts.json');
+const azureStorage = require('azure-storage');
+const blobService = azureStorage.createBlobService();
+const container = MULTIMEDIACOMMENTS.split('/')[0];
+const streamifier = require('streamifier');
+const faker = require('faker');
 
 //GET ALL PRODUCTS
 router.get('/', async (req, res, next) => {
@@ -13,7 +18,7 @@ router.get('/', async (req, res, next) => {
 
     const { size } = req.query;
     const filter = req.body;
-    const comments = await service.find(size || 10, filter);
+    const comments = await service.find(size, filter);
     res.json({
       'success': true,
       'message': 'Estos son los comentarios encontrados',
@@ -30,13 +35,60 @@ router.get('/', async (req, res, next) => {
 router.post('/', validatorHandler(createCommentchema, 'body'), async (req, res, next) => {
   try {
     const body = req.body;
-    const comment = await service.create(body);
 
-    res.json({
-      'success': true,
-      'message': "El comentario se ha creado con exito",
-      'Data': comment
-    });
+
+    const { multimedia } = body;
+
+    //const recommended = await service.create(body);
+    if (multimedia) {
+
+      let { name, path, extention } = multimedia;
+      console.log(req.body);
+      name = faker.datatype.uuid() + name + "." + extention;
+
+      let buffer = new Buffer(path, 'base64')
+      var stream = streamifier.createReadStream(buffer);
+      await blobService.createBlockBlobFromStream(container, name, stream, buffer.byteLength, {
+        contentType: extention
+      }, async function (err) {
+        if (err) {
+
+          res.json({
+            'success': false,
+            'message': err
+          });
+
+        } else {
+
+          const fileURL = `${MULTIMEDIAURL}${MULTIMEDIACOMMENTS}${name}`;
+
+
+          multimedia['name'] = name;
+          multimedia['extention'] = extention;
+          multimedia['path'] = fileURL;
+
+
+          body['multimedia'] = multimedia;
+          const comment = await service.create(body);
+          res.json({
+            'success': true,
+            'message': "El usuario se ha creado con exito",
+            'Data': comment
+          });
+        }
+
+      })
+
+
+    } else {
+      const comment = await service.create(body);
+
+      res.json({
+        'success': true,
+        'message': "El usuario se ha creado con exito",
+        'Data': comment
+      });
+    }
   } catch (error) {
     next(error);
   }

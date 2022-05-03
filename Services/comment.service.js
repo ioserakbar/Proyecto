@@ -18,7 +18,8 @@ class CommentService{
     if(comments.length <= 0 )
       throw boom.notFound(errEmpty);
 
-    comments = comments.filter((item, index) => item && index < limit);
+    if(limit)
+      comments = comments.filter((item, index) => item && index < limit);
     
     return comments;
 
