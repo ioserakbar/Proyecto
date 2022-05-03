@@ -43,7 +43,7 @@ router.post('/', validatorHandler(createCommentchema, 'body'), async (req, res, 
     if (multimedia) {
 
       let { name, path, extention } = multimedia;
-      console.log(req.body);
+      
       name = faker.datatype.uuid() + name + "." + extention;
 
       let buffer = new Buffer(path, 'base64')
