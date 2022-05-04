@@ -117,6 +117,23 @@ router.get('/:id', validatorHandler(getValidPublication, 'params'), async (req, 
   }
 
 });
+//get publications by user
+router.get('/user/:id', validatorHandler(getValidPublication, 'params'), async (req, res, next) => {
+
+  try {
+    const { id } = req.params;
+    const filter = {userID: id} 
+    const publication = await service.find(null, filter);
+    res.json({
+      'success': true,
+      'message': 'Esta es la publicacion encontrada',
+      'Data': publication
+    });
+  } catch (error) {
+    next(error);
+  }
+
+});
 
 router.get('/:id/stats/:userID', validatorHandler(getValidPublication, 'params'), async (req, res, next) => {
   try {
