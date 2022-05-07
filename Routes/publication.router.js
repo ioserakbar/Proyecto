@@ -117,6 +117,7 @@ router.get('/:id', validatorHandler(getValidPublication, 'params'), async (req, 
   }
 
 });
+
 //get publications by user
 router.get('/user/:id', validatorHandler(getValidPublication, 'params'), async (req, res, next) => {
 

@@ -6,7 +6,7 @@ const gameSchema = new Schema({
   id: String,
   name: String,
   developers: String,
-  image: String,
+  image: Object,
   ranking: Array
 })
 

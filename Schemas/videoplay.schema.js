@@ -15,7 +15,7 @@ const createVideoplaySchema = Joi.object({
   date: date.required(),
   gameID: gameID.required(),
   userID: userID.required(),
-  conten: content,
+  content: content,
   multimedia: multimedia.required()
 });
 

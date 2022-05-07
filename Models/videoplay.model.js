@@ -8,7 +8,7 @@ const videoPlaySchema = new Schema({
   gameID: String,
   userID: String,
   content: String,
-  multimedia: String
+  multimedia: Object
 })
 
 const modelVideoPlay = mongoose.model('videoPlay', videoPlaySchema);

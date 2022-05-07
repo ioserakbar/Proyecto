@@ -4,5 +4,8 @@
   "MULTIMEDIAPROFILEPICS":"profilepics/",
   "MULTIMEDIABACKGROUNDPICS":"backgroundpics/",
   "MULTIMEDIAPUBLICATIONS":"publications/",
-  "MULTIMEDIACOMMENTS":"comments/"
+  "MULTIMEDIACOMMENTS":"comments/",
+  "MULTIMEDIAPLAYS": "videoplays/",
+  "MULTIMEDIAGAMEICON":"gameicons/",
+  "MULTIMEDIARANKEDICON":"rankedicons/"
 }
