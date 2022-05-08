@@ -90,7 +90,7 @@ router.post('/', validatorHandler(createUserSchema, 'body'), async (req, res, ne
 
         } else {
 
-          const fileURL =`${MULTIMEDIAURL}${MULTIMEDIAPROFILEPICS}${name}`;
+          const fileURL = `${MULTIMEDIAURL}${MULTIMEDIAPROFILEPICS}${name}`;
 
           body["profilePic"]["path"] = fileURL;
           const user = await service.create(body);
@@ -104,9 +104,6 @@ router.post('/', validatorHandler(createUserSchema, 'body'), async (req, res, ne
         }
 
       })
-
-
-
     } else {
       const user = await service.create(body);
 
@@ -116,16 +113,48 @@ router.post('/', validatorHandler(createUserSchema, 'body'), async (req, res, ne
         'Data': user
       });
     }
-
-
-
   } catch (error) {
     next(error);
   }
 
 });
 
+router.patch('/:id/addGame/', validatorHandler(getValidUser, 'params'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { gameID, ranked } = req.body;
+    const user = await service.findOne(id);
+    let userGames = [];
+    if (user.favoriteGames.length !== 0) {
+      user.favoriteGames.push({
+        tiempoJugado: null,
+        gameID: gameID,
+        RANKED: ranked
+      });
 
+
+    } else {
+      userGames[0] = {
+        tiempoJugado: null,
+        gameID: gameID,
+        RANKED: ranked
+      };
+      user.favoriteGames = userGames;
+    }
+
+    const { old, changed } = await service.update(id, user);
+    res.json({
+      'success': true,
+      'message': 'El  usuario ah sido editado',
+      'Data': {
+        "old": old,
+        "new": changed
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS

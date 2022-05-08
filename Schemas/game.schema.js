@@ -1,8 +1,8 @@
 const Joi = require('joi');
 
 const id = Joi.string();
-const name = Joi.string().min(2).max(25);
-const developers = Joi.string().min(2).max(30);
+const name = Joi.string().min(2).max(60);
+const developers = Joi.string().min(2).max(60);
 const image = Joi.object().keys({
   name: Joi.string(),
   path: Joi.string(),
@@ -37,7 +37,6 @@ const updateGameSchema = Joi.object({
 const getValidGame = Joi.object({
   id: id.required()
 });
-
 
 
 module.exports = {

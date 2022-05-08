@@ -56,50 +56,54 @@ router.post('/', validatorHandler(createGameSchema, 'body'), async (req, res, ne
       } else {
 
         const { ranking } = body;
+        const fileURL = `${MULTIMEDIAURL}${MULTIMEDIAGAMEICON}${name}`;
 
+
+        image['name'] = name;
+        image['extention'] = extention;
+        image['path'] = fileURL;
+        body['image'] = image;
+        
         if (ranking.length !== 0) {
-          const fileURL = `${MULTIMEDIAURL}${MULTIMEDIAGAMEICON}${name}`;
 
 
-          image['name'] = name;
-          image['extention'] = extention;
-          image['path'] = fileURL;
-          body['image'] = image;
-          let forIndex = 0;
           let rankedArray = [];
+          let forIndex = 0;
           for (const ranked of ranking) {
 
-            let { name, extention, path } = ranked.image;
+            let name2 = ranked.image.name;
+            let extention2 = ranked.image.extention;
+            let path2 = ranked.image.path;
 
+            name2 = faker.datatype.uuid() + name2 + "." + extention2;
 
-            name = faker.datatype.uuid() + name + "." + extention;
-
-            let buffer = new Buffer(path, 'base64')
-            var stream = streamifier.createReadStream(buffer);
-            await blobService.createBlockBlobFromStream(containerRanked, name, stream, buffer.byteLength, {
-              contentType: extention
-            }, async function (err) {
-              if (err) {
+            let buffer2 = new Buffer(path2, 'base64')
+            var stream2 = streamifier.createReadStream(buffer2);
+            blobService.createBlockBlobFromStream(containerRanked, name2, stream2, buffer2.byteLength, {
+              contentType: extention2
+            }, async function (err2) {
+              if (err2) {
 
                 res.json({
                   'success': false,
-                  'message': err
+                  'message': err2
                 });
 
               } else {
 
-                const fileURL = `${MULTIMEDIAURL}${MULTIMEDIARANKEDICON}${name}`;
-                var obj = {};
-                obj['name'] = name;
-                obj['extention'] = extention;
-                obj['path'] = fileURL;
+                const fileURL2 = `${MULTIMEDIAURL}${MULTIMEDIARANKEDICON}${name2}`;
+                var objImage = {};
+                objImage['name'] = name2;
+                objImage['extention'] = extention2;
+                objImage['path'] = fileURL2;
 
-                var rank = {};
-                rank.name = ranked.name;
-                rank.index = ranked.index;
-                rank.image = obj;
+                let rankedObj = {};
+                rankedObj.index = ranked.index;
+                rankedObj.name = ranked.name;
+                rankedObj.IMAGE = objImage;
 
-                rankedArray.push(rank);
+                rankedArray.push(rankedObj);
+
                 if (forIndex === ranking.length - 1) {
                   body['ranking'] = rankedArray;
                   const game = await service.create(body);
@@ -111,15 +115,16 @@ router.post('/', validatorHandler(createGameSchema, 'body'), async (req, res, ne
                 }
                 forIndex++;
               }
-              
+
             })
+
           };
         } else {
-          const publication = await service.create(body);
+          const game = await service.create(body);
           res.json({
             'success': true,
             'message': "El usuario se ha creado con exito",
-            'Data': publication
+            'Data': game
           });
         }
 
