@@ -1,17 +1,18 @@
-const express= require('express');
+const express = require('express');
 const router = express.Router();
 const Service = require('../Services/linkedAccount.service');
 const service = new Service();
 const validatorHandler = require('./../Middlewares/validator.handler')
-const {  createLinkedAccountSchema, updateLinkedAccountSchema, getValidLinkedAccount  } = require('../Schemas/linkedAccount.schema');
+const { createLinkedAccountSchema, updateLinkedAccountSchema, getValidLinkedAccount } = require('../Schemas/linkedAccount.schema');
+const ensureToken = require('../Middlewares/ensureToken.handler');
 
 
 //GET ALL PRODUCTS
-router.get('/', async (req, res, next) => {
+router.get('/', ensureToken, async (req, res, next) => {
 
-  try{
+  try {
 
-    const {size} = req.query;
+    const { size } = req.query;
     const filter = req.body;
     const linkedAccounts = await service.find(size || 10, filter);
     res.json({
@@ -20,23 +21,23 @@ router.get('/', async (req, res, next) => {
       'Data': linkedAccounts
     });
 
-  } catch (error){
+  } catch (error) {
     next(error);
   }
 
 });
- 
+
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createLinkedAccountSchema, 'body'), async (req, res, next) => {  
+router.post('/', ensureToken, validatorHandler(createLinkedAccountSchema, 'body'), async (req, res, next) => {
   try {
     const body = req.body;
     const linkedAccount = await service.create(body);
 
     res.json({
-      'success': true, 
-      'message': "La cuenta linkeada se ha creado con exito", 
-      'Data': linkedAccount 
-   });
+      'success': true,
+      'message': "La cuenta linkeada se ha creado con exito",
+      'Data': linkedAccount
+    });
   } catch (error) {
     next(error);
   }
@@ -45,17 +46,17 @@ router.post('/', validatorHandler(createLinkedAccountSchema, 'body'), async (req
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidLinkedAccount, 'params'),  async (req, res, next) => {
-  try{
-    const {id} = req.params;
+router.get('/:id', ensureToken, validatorHandler(getValidLinkedAccount, 'params'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-    const linkedAccount =  await service.findOne(id);
+    const linkedAccount = await service.findOne(id);
     res.json({
       'success': true,
       'message': 'Este es la cuenta linkeada encontrada',
       'Data': linkedAccount
     });
-  } catch (error){
+  } catch (error) {
     next(error);
   }
 });
@@ -63,11 +64,11 @@ router.get('/:id', validatorHandler(getValidLinkedAccount, 'params'),  async (re
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidLinkedAccount, 'params'), validatorHandler(updateLinkedAccountSchema, 'body'), async (req, res, next) => {
+router.patch('/:id', ensureToken, validatorHandler(getValidLinkedAccount, 'params'), validatorHandler(updateLinkedAccountSchema, 'body'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
-    const { old, changed} = await service.update(id, data);
+    const { old, changed } = await service.update(id, data);
     res.json({
       'success': true,
       'message': "Se ha actualizado la siguiente cuenta linkeada",
@@ -82,7 +83,7 @@ router.patch('/:id', validatorHandler(getValidLinkedAccount, 'params'), validato
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidLinkedAccount, 'params'), async (req, res, next) => {
+router.delete('/:id', ensureToken, validatorHandler(getValidLinkedAccount, 'params'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const linkedAccount = await service.delete(id);
@@ -91,7 +92,7 @@ router.delete('/:id', validatorHandler(getValidLinkedAccount, 'params'), async (
       'message': "Se ha eliminado esta cuenta linkeada",
       'Data': {
         "message": "Cuenta linkeada eliminada",
-        "Data" : linkedAccount
+        "Data": linkedAccount
       }
     });
   } catch (error) {

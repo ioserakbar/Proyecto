@@ -10,9 +10,10 @@ const blobService = azureStorage.createBlobService();
 const container = MULTIMEDIAPLAYS.split('/')[0];
 const streamifier = require('streamifier');
 const faker = require('faker');
+const ensureToken = require('../Middlewares/ensureToken.handler');
 
 //GET ALL PRODUCTS
-router.get('/', async (req, res, next) => {
+router.get('/', ensureToken, async (req, res, next) => {
 
   try {
 
@@ -32,7 +33,7 @@ router.get('/', async (req, res, next) => {
 });
 
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createVideoplaySchema, 'body'), async (req, res, next) => {
+router.post('/', ensureToken, validatorHandler(createVideoplaySchema, 'body'), async (req, res, next) => {
   try {
 
     const body = req.body;
@@ -61,7 +62,7 @@ router.post('/', validatorHandler(createVideoplaySchema, 'body'), async (req, re
         multimedia['name'] = name;
         multimedia['extention'] = extention;
         multimedia['path'] = fileURL;
-        
+
         body['multimedia'] = multimedia;
         const comment = await service.create(body);
         res.json({
@@ -80,7 +81,7 @@ router.post('/', validatorHandler(createVideoplaySchema, 'body'), async (req, re
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidVideoplay, 'params'), async (req, res, next) => {
+router.get('/:id', ensureToken, validatorHandler(getValidVideoplay, 'params'), async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -96,7 +97,7 @@ router.get('/:id', validatorHandler(getValidVideoplay, 'params'), async (req, re
 });
 
 //get plays by user
-router.get('/user/:id', validatorHandler(updateVideoplaySchema, 'body'), async (req, res, next) => {
+router.get('/user/:id', ensureToken, validatorHandler(updateVideoplaySchema, 'body'), async (req, res, next) => {
 
   try {
 
@@ -121,7 +122,7 @@ router.get('/user/:id', validatorHandler(updateVideoplaySchema, 'body'), async (
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidVideoplay, 'params'), validatorHandler(updateVideoplaySchema, 'body'), async (req, res, next) => {
+router.patch('/:id', ensureToken, validatorHandler(getValidVideoplay, 'params'), validatorHandler(updateVideoplaySchema, 'body'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
@@ -140,7 +141,7 @@ router.patch('/:id', validatorHandler(getValidVideoplay, 'params'), validatorHan
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidVideoplay, 'params'), async (req, res, next) => {
+router.delete('/:id', ensureToken, validatorHandler(getValidVideoplay, 'params'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const videoplay = await service.delete(id);

@@ -10,8 +10,10 @@ const azureStorage = require('azure-storage');
 const blobService = azureStorage.createBlobService();
 const container = MULTIMEDIAPUBLICATIONS.split('/')[0];
 const streamifier = require('streamifier');
+const ensureToken = require('./../Middlewares/ensureToken.handler');
+
 //GET ALL PRODUCTS
-router.get('/', async (req, res, next) => {
+router.get('/', ensureToken, async (req, res, next) => {
 
   try {
 
@@ -31,7 +33,7 @@ router.get('/', async (req, res, next) => {
 });
 
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createPublicationSchema, 'body'), async (req, res, next) => {
+router.post('/', ensureToken, validatorHandler(createPublicationSchema, 'body'), async (req, res, next) => {
   try {
     const body = req.body;
 
@@ -101,7 +103,7 @@ router.post('/', validatorHandler(createPublicationSchema, 'body'), async (req, 
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidPublication, 'params'), async (req, res, next) => {
+router.get('/:id', ensureToken, validatorHandler(getValidPublication, 'params'), async (req, res, next) => {
 
   try {
     const { id } = req.params;
@@ -119,11 +121,11 @@ router.get('/:id', validatorHandler(getValidPublication, 'params'), async (req, 
 });
 
 //get publications by user
-router.get('/user/:id', validatorHandler(getValidPublication, 'params'), async (req, res, next) => {
+router.get('/user/:id', ensureToken, validatorHandler(getValidPublication, 'params'), async (req, res, next) => {
 
   try {
     const { id } = req.params;
-    const filter = {userID: id} 
+    const filter = { userID: id }
     const publication = await service.find(null, filter);
     res.json({
       'success': true,
@@ -136,7 +138,7 @@ router.get('/user/:id', validatorHandler(getValidPublication, 'params'), async (
 
 });
 
-router.get('/:id/stats/:userID', validatorHandler(getValidPublication, 'params'), async (req, res, next) => {
+router.get('/:id/stats/:userID', ensureToken, validatorHandler(getValidPublication, 'params'), async (req, res, next) => {
   try {
     const { id, userID } = req.params;
 
@@ -163,7 +165,7 @@ router.get('/:id/stats/:userID', validatorHandler(getValidPublication, 'params')
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidPublication, 'params'), validatorHandler(updatePublicationSchema, 'body'), async (req, res, next) => {
+router.patch('/:id', ensureToken, validatorHandler(getValidPublication, 'params'), validatorHandler(updatePublicationSchema, 'body'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
@@ -182,7 +184,7 @@ router.patch('/:id', validatorHandler(getValidPublication, 'params'), validatorH
 });
 
 
-router.patch('/:id/statsChange', async (req, res, next) => {
+router.patch('/:id/statsChange', ensureToken, async (req, res, next) => {
   try {
     const { id } = req.params;
     const { statOption, userID } = req.body;
@@ -227,7 +229,7 @@ router.patch('/:id/statsChange', async (req, res, next) => {
       } else if (statOption === 'dislike') {
         toAdd.like = false;
         toAdd.dislike = true;
-      }else{
+      } else {
         toAdd.like = false;
         toAdd.dislike = false;
       }
@@ -258,7 +260,7 @@ router.patch('/:id/statsChange', async (req, res, next) => {
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidPublication, 'params'), async (req, res, next) => {
+router.delete('/:id', ensureToken, validatorHandler(getValidPublication, 'params'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const publication = await service.delete(id);

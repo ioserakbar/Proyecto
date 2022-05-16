@@ -1,17 +1,18 @@
-const express= require('express');
+const express = require('express');
 const router = express.Router();
 const Service = require('../Services/recommended.service');
 const service = new Service();
 const validatorHandler = require('./../Middlewares/validator.handler')
 const { createRecommendedSchema, updateRecommendedSchema, getValidRecommended } = require('../Schemas/recommended.schema');
+const ensureToken = require('../Middlewares/ensureToken.handler');
 
 
 //GET ALL PRODUCTS
-router.get('/', async (req, res, next) => {
+router.get('/', ensureToken, async (req, res, next) => {
 
-  try{
+  try {
 
-    const {size} = req.query;
+    const { size } = req.query;
     const filter = req.filter;
     const recommendeds = await service.find(size || 10, filter);
     res.json({
@@ -20,23 +21,23 @@ router.get('/', async (req, res, next) => {
       'Data': recommendeds
     });
 
-  } catch (error){
+  } catch (error) {
     next(error);
   }
 
 });
- 
+
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createRecommendedSchema, 'body'), async (req, res, next) => {  
+router.post('/', ensureToken, validatorHandler(createRecommendedSchema, 'body'), async (req, res, next) => {
   try {
     const body = req.body;
     const recommended = await service.create(body);
 
     res.json({
-      'success': true, 
-      'message': "El recomendado se ha creado con exito", 
-      'Data': recommended 
-   });
+      'success': true,
+      'message': "El recomendado se ha creado con exito",
+      'Data': recommended
+    });
   } catch (error) {
     next(error);
   }
@@ -45,17 +46,17 @@ router.post('/', validatorHandler(createRecommendedSchema, 'body'), async (req, 
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidRecommended, 'params'),  async (req, res, next) => {
-  try{
-    const {id} = req.params;
+router.get('/:id', ensureToken, validatorHandler(getValidRecommended, 'params'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-    const recommended =  await service.findOne(id);
+    const recommended = await service.findOne(id);
     res.json({
       'success': true,
       'message': 'Este es el recomendado encontrado',
       'Data': recommended
     });
-  } catch (error){
+  } catch (error) {
     next(error);
   }
 });
@@ -63,11 +64,11 @@ router.get('/:id', validatorHandler(getValidRecommended, 'params'),  async (req,
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidRecommended, 'params'), validatorHandler(updateRecommendedSchema, 'body'), async (req, res, next) => {
+router.patch('/:id', ensureToken, validatorHandler(getValidRecommended, 'params'), validatorHandler(updateRecommendedSchema, 'body'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
-    const { old, changed} = await service.update(id, data);
+    const { old, changed } = await service.update(id, data);
     res.json({
       'success': true,
       'message': "Se ha actualizado el siguiente recomendado",
@@ -82,7 +83,7 @@ router.patch('/:id', validatorHandler(getValidRecommended, 'params'), validatorH
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidRecommended, 'params'), async (req, res, next) => {
+router.delete('/:id', ensureToken, validatorHandler(getValidRecommended, 'params'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const recommended = await service.delete(id);
@@ -91,7 +92,7 @@ router.delete('/:id', validatorHandler(getValidRecommended, 'params'), async (re
       'message': "Se ha eliminado este recomendado",
       'Data': {
         "message": "Recomendado eliminado",
-        "product" : recommended
+        "product": recommended
       }
     });
   } catch (error) {

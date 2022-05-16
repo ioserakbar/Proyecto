@@ -3,41 +3,40 @@ const boom = require('@hapi/boom');
 const MessageModel = require("../Models/message.model")
 const errNotFound = "No se logró encontrar lo buscado";
 const errEmpty = "Aún no hay cuentas creadas";
-class MessageService{
+class MessageService {
 
   //FIND ALL INFO
-  async find(limit, filter){
+  async find(limit, filter) {
 
     let messages = await MessageModel.find(filter);
-    
 
-    if(messages == undefined || messages == null)
+
+    if (messages == undefined || messages == null)
       throw boom.notFound(errNotFound);
-    else if (messages.length <= 0 )
-      throw boom.notFound(errEmpty);
 
-    messages = messages.filter((item, index) => item && index < limit);
+    if (limit)
+      messages = messages.filter((item, index) => item && index < limit);
     return messages;
 
   }
 
   //CREATE INFO
-  async create(data){
+  async create(data) {
     const newMessage = new MessageModel(data);
-    await newMessage.save(); 
+    await newMessage.save();
     return data;
   }
 
   //FIND SPECIFIC ACCOUNT
-  async findOne(id){
+  async findOne(id) {
 
     const message = await MessageModel.findOne({
-      _id:id
+      _id: id
     })
 
-    if(message == undefined || message == null)
+    if (message == undefined || message == null)
       throw boom.notFound(errNotFound);
-    else if (message.length <= 0 )
+    else if (message.length <= 0)
       throw boom.notFound(errEmpty);
 
     return message;
@@ -45,66 +44,66 @@ class MessageService{
   }
 
   //EDIT SPECIFIC ACCOUNT
-  async update(id, changes){
+  async update(id, changes) {
 
     let message = await MessageModel.findOne({
-      _id:id
+      _id: id
     });
-    
-    if(message == undefined || message == null)
+
+    if (message == undefined || message == null)
       throw boom.notFound(errNotFound);
-    if(message.length <= 0 )
+    if (message.length <= 0)
       throw boom.notFound(errEmpty);
 
     let originalMessage = {
-      content:message.content,
-      multimediaID:message.multimediaID,
-      date:message.date,
-      hour:message.hour,
-      userSenderID:message.userSenderID,
-      chatRoomID:message.chatRoomID
+      content: message.content,
+      multimediaID: message.multimediaID,
+      date: message.date,
+      userSenderID: message.userSenderID,
+      chatRoomID: message.chatRoomID,
+      seen: message.seen
     };
 
-    const {content, multimediaID, date, hour, userSenderID, chatRoomID} = changes;
+    const { content, multimediaID, date,  userSenderID, chatRoomID, seen } = changes;
 
-    if(content)
+    if (content)
       message.content = content
-    if(multimediaID)
+    if (multimediaID)
       message.multimediaID = multimediaID
-    if(date)
+    if (date)
       message.date = date
-    if(hour)
-      message.hour = hour
-    if(userSenderID)
+    if (userSenderID)
       message.userSenderID = userSenderID
-    if(chatRoomID)
+    if (chatRoomID)
       message.chatRoomID = chatRoomID
+    if (seen)
+      message.seen = seen;
 
     await message.save();
-    
+
     return {
-      old : originalMessage, 
+      old: originalMessage,
       changed: message
     };
   }
 
-  async delete(id){
-    
+  async delete(id) {
+
     let message = await MessageModel.findOne({
-      _id:id
+      _id: id
     });
 
     const { deletedCount } = await MessageModel.deleteOne({
-      _id:id
+      _id: id
     });
 
-    if(deletedCount <= 0 )
+    if (deletedCount <= 0)
       throw boom.notFound(errEmpty);
-    
+
     return message;
   }
-    
-   
+
+
 }
 
 module.exports = MessageService;

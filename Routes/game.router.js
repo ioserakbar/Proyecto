@@ -11,9 +11,10 @@ const containerGame = MULTIMEDIAGAMEICON.split('/')[0];
 const containerRanked = MULTIMEDIARANKEDICON.split('/')[0];
 const streamifier = require('streamifier');
 const faker = require('faker');
+const ensureToken = require('../Middlewares/ensureToken.handler');
 
 //GET ALL PRODUCTS
-router.get('/', async (req, res, next) => {
+router.get('/', ensureToken, async (req, res, next) => {
 
   try {
 
@@ -33,7 +34,7 @@ router.get('/', async (req, res, next) => {
 });
 
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createGameSchema, 'body'), async (req, res, next) => {
+router.post('/', ensureToken, validatorHandler(createGameSchema, 'body'), async (req, res, next) => {
   try {
     const body = req.body;
     const { image } = body;
@@ -63,7 +64,7 @@ router.post('/', validatorHandler(createGameSchema, 'body'), async (req, res, ne
         image['extention'] = extention;
         image['path'] = fileURL;
         body['image'] = image;
-        
+
         if (ranking.length !== 0) {
 
 
@@ -82,6 +83,7 @@ router.post('/', validatorHandler(createGameSchema, 'body'), async (req, res, ne
             blobService.createBlockBlobFromStream(containerRanked, name2, stream2, buffer2.byteLength, {
               contentType: extention2
             }, async function (err2) {
+
               if (err2) {
 
                 res.json({
@@ -141,7 +143,7 @@ router.post('/', validatorHandler(createGameSchema, 'body'), async (req, res, ne
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidGame, 'params'), async (req, res, next) => {
+router.get('/:id', ensureToken, validatorHandler(getValidGame, 'params'), async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -159,7 +161,7 @@ router.get('/:id', validatorHandler(getValidGame, 'params'), async (req, res, ne
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidGame, 'params'), validatorHandler(updateGameSchema, 'body'), async (req, res, next) => {
+router.patch('/:id', ensureToken, validatorHandler(getValidGame, 'params'), validatorHandler(updateGameSchema, 'body'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
@@ -178,7 +180,7 @@ router.patch('/:id', validatorHandler(getValidGame, 'params'), validatorHandler(
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidGame, 'params'), async (req, res, next) => {
+router.delete('/:id', ensureToken, validatorHandler(getValidGame, 'params'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const game = await service.delete(id);

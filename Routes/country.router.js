@@ -1,15 +1,16 @@
-const express= require('express');
+const express = require('express');
 const router = express.Router();
 const Service = require('../Services/country.service');
 const service = new Service();
 const validatorHandler = require('./../Middlewares/validator.handler')
 const { createCountrySchema, updateCountrySchema, getValidCountry } = require('../Schemas/country.schema');
+const ensureToken = require('../Middlewares/ensureToken.handler');
 
 
 //GET ALL PRODUCTS
-router.get('/', async (req, res, next) => {
+router.get('/', ensureToken, async (req, res, next) => {
 
-  try{
+  try {
 
     const { size } = req.query;
     const filter = req.body;
@@ -20,23 +21,23 @@ router.get('/', async (req, res, next) => {
       'Data': countries
     });
 
-  } catch (error){
+  } catch (error) {
     next(error);
   }
 
 });
- 
+
 //CREATE PRODUCTS
-router.post('/', validatorHandler(createCountrySchema, 'body'), async (req, res, next) => {  
+router.post('/', ensureToken, validatorHandler(createCountrySchema, 'body'), async (req, res, next) => {
   try {
     const body = req.body;
-    const country =  await service.create(body);
+    const country = await service.create(body);
 
     res.json({
-      'success': true,  
-      'message': "El pais se ha creado con exito", 
-      'Data': country 
-   });
+      'success': true,
+      'message': "El pais se ha creado con exito",
+      'Data': country
+    });
   } catch (error) {
     next(error);
   }
@@ -45,9 +46,9 @@ router.post('/', validatorHandler(createCountrySchema, 'body'), async (req, res,
 
 //rutas especificas /:id
 //GET PRODUCTS BY ID
-router.get('/:id', validatorHandler(getValidCountry, 'params'),  async (req, res, next) => {
-  try{
-    const {id} = req.params;
+router.get('/:id', ensureToken, validatorHandler(getValidCountry, 'params'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
     const country = await service.findOne(id);
     res.json({
@@ -55,7 +56,7 @@ router.get('/:id', validatorHandler(getValidCountry, 'params'),  async (req, res
       'message': 'Este es el pais encontrado',
       'Data': country
     });
-  } catch (error){
+  } catch (error) {
     next(error);
   }
 });
@@ -63,11 +64,11 @@ router.get('/:id', validatorHandler(getValidCountry, 'params'),  async (req, res
 //PUT = TODOS LOS CAMPOS SE ACTUALIZAN
 //PATCH =  ACTUALIZACION PARCIAL DE CAMPOS
 //UPDATE
-router.patch('/:id', validatorHandler(getValidCountry, 'params'), validatorHandler(updateCountrySchema, 'body'), async (req, res, next) => {
+router.patch('/:id', ensureToken, validatorHandler(getValidCountry, 'params'), validatorHandler(updateCountrySchema, 'body'), async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = req.body;
-    const { old, changed} = await service.update(id, data);
+    const { old, changed } = await service.update(id, data);
     res.json({
       'success': true,
       'message': "Se ha actualizado el siguiente pais",
@@ -82,16 +83,16 @@ router.patch('/:id', validatorHandler(getValidCountry, 'params'), validatorHandl
 });
 
 //DELETE
-router.delete('/:id', validatorHandler(getValidCountry, 'params'), async (req, res, next) => {
+router.delete('/:id', ensureToken, validatorHandler(getValidCountry, 'params'), async (req, res, next) => {
   try {
     const { id } = req.params;
-    const country =  await service.delete(id);
+    const country = await service.delete(id);
     res.json({
       'success': true,
       'message': "Se ha eliminado este pais",
       'Data': {
         "message": "Pais eliminado",
-        "Data" : country
+        "Data": country
       }
     });
   } catch (error) {

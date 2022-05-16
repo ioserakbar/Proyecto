@@ -7,9 +7,9 @@ const messageSchema = new Schema({
   content: String,
   multimediaID: String,
   date: Date,
-  hour: String,
   userSenderID: String,
-  chatRoomID: String
+  chatRoomID: String,
+  seen: Boolean
 })
 
 const modelMessage = mongoose.model('message', messageSchema);

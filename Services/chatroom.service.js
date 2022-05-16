@@ -8,8 +8,6 @@ const errEmpty = "Aún no hay cuentas creadas";
 
 class ChatroomService{
 
-  
-
   //FIND ALL INFO
   async find(limit, filter){
     
@@ -17,10 +15,9 @@ class ChatroomService{
     
     if(chatrooms == undefined || chatrooms == null)
       throw boom.notFound(errNotFound);
-    if(chatrooms.length <= 0 )
-      throw boom.notFound(errEmpty);
 
-    chatrooms = chatrooms.filter((item, index) => item && index < limit);
+    if(limit)
+      chatrooms = chatrooms.filter((item, index) => item && index < limit);
     
     return chatrooms;
 
@@ -31,7 +28,7 @@ class ChatroomService{
 
     const newChatRoom = new ChatRoomModel(data);
     await newChatRoom.save(); 
-    return data;
+    return newChatRoom;
   }
 
   //FIND SPECIFIC ACCOUNT

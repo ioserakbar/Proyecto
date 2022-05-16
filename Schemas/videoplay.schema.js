@@ -4,7 +4,7 @@ const id = Joi.string();
 const date = Joi.date();
 const gameID = Joi.string();
 const userID = Joi.string();
-const content = Joi.string().max(250);
+const content = Joi.string().max(250).min(0);
 const multimedia = Joi.object().keys({
   name: Joi.string(),
   path: Joi.string(),
